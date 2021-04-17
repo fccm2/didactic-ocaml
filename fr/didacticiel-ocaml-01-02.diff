@@ -1,0 +1,52 @@
+--- didacticiel-ocaml-01.html	2026-05-10 09:43:53.900275626 +0200
++++ didacticiel-ocaml-02.html	2026-05-10 09:43:53.916275625 +0200
+@@ -153,12 +153,15 @@
+ 
+   <div>
+     Tout d'abord une courte pr&eacute;sentation d'OCaml.
+-    Il s'agit d'un projet initi&eacute; par <a href="http://www.inria.fr/">l'INRIA</a>.<br />
++    Il s'agit d'un projet initi&eacute; par l'INRIA
++    (<a href="http://www.inria.fr/">inria.fr</a>,
++    <a href="http://fr.wikipedia.org/wiki/INRIA">wp</a>).
++    <br />
+     Le langage OCaml fournit une exceptionnelle suret&eacute; d'ex&eacute;cution notament
+     gr&acirc;ce au fait que tout ses &eacute;l&eacute;ments soient
+-    &laquo;&nbsp;Tr&egrave;s Fortement Typ&eacute;s&nbsp;&raquo;.<br />
++    &laquo;&nbsp;tr&egrave;s fortement typ&eacute;s&nbsp;&raquo;.<br />
+     Ce dernier point requi&egrave;re un certain temps d'adaptation au d&eacute;but, mais est d'une aide
+-    pr&eacute;cieuse par la suite.
++    pr&eacute;cieuse par la suite.<br />
+   </div>
+ 
+ 
+@@ -239,12 +242,29 @@
+   <div>
+     Voici pour vous mettre l'eau &agrave; la bouche et vous donner l'envie de
+     continuer. Maintenant pour pouvoir suivre le premier volet de cette
+-    initiation, t&eacute;l&eacute;chargez et installez OCaml &agrave; partir de&nbsp;:
++    initiation, t&eacute;l&eacute;chargez et installez OCaml &agrave; partir
++    de cette adresse
+     <a href="https://ocaml.org/docs/install.fr.html"
+             >https://ocaml.org/docs/install.fr.html</a>
+     ou bien &agrave; l'aide de l'installeur fournit par votre distribution.
+   </div>
+ 
++  <div id="def_get_src">
++    Ou encore &agrave; partir des sources qui sont disponibles par exemple ici&nbsp;:
++    <br />
++    <a href="https://caml.inria.fr/pub/distrib/"
++            >https://caml.inria.fr/pub/distrib/</a>
++  </div>
++
++
++  <hr />
++  <!-- ======================================================== -->
++
++  <div>
++    &nbsp;
++    <br />
++    &nbsp;
++  </div>
+ 
+ 
+ 
