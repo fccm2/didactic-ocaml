@@ -1,0 +1,144 @@
+--- didacticiel-ocaml-06.html	2026-05-10 09:43:53.962275624 +0200
++++ didacticiel-ocaml-07.html	2026-05-10 09:43:53.976275624 +0200
+@@ -383,7 +383,7 @@
+   </div>
+ 
+   <div class="nb">
+-    Si l'on tente d'acc&eacute;der &agrave; un caract&egrave;re au del&agrave; du dernier, une
++    Si on tente d'acc&eacute;der &agrave; un caract&egrave;re au del&agrave; du dernier, une
+     exception est lev&eacute;e&nbsp;:
+   </div>
+ <pre>
+@@ -825,7 +825,7 @@
+     totalement &eacute;quivalent en raison des possibilit&eacute;s d'application
+     partielle d'OCaml qui seront vues ult&eacute;rieurement.<br />
+     Ici on voit que la fonction '<code>length</code>' prend un argument
+-    de type '<code>string</code>' (cha&icric;ne de caract&egrave;re) et qu'elle renvoie
++    de type '<code>string</code>' (cha&icirc;ne de caract&egrave;re) et qu'elle renvoie
+     un &eacute;l&eacute;ment de type '<code>int</code>' (entier).
+   </div>
+ 
+@@ -1136,8 +1136,8 @@
+   </div>
+ 
+   <div>
+-    La structure de control 'match' permet de diriger l'ex&eacute;cution du programme
+-    en fonction de diff&eacute;rentes valeures, ou motifs.
++    La structure de contr&ocirc;le 'match' permet de diriger l'ex&eacute;cution
++    du programme en fonction de diff&eacute;rentes valeures, ou motifs.
+   </div>
+ 
+   <div class="nb">
+@@ -1433,7 +1433,7 @@
+     (ou "immutable update" en anglais)<br />
+     En programmation fonctionnelle les variables ne sont pas sens&eacute;es changer de valeur,
+     pour obtenir un nouvel enregistrement avec un des champs mis &agrave; jour,
+-    en OCaml on proc&eacute;de comme suit&nbsp;:
++    en OCaml on proc&egrave;de comme suit&nbsp;:
+   </div>
+ <!--
+ # let doe = { doe with telephone = "02.74.16.48" } ;;
+@@ -1933,7 +1933,7 @@
+ </pre>
+ 
+   <div>
+-    Et pour ce qui est de cr&eacute;er des ex&eacute;cutables pour de meilleures performances,
++    Et pour ce qui est de cr&eacute;er des ex&eacute;cutables pour de meilleures performences,
+     vous pouvez compiler votre fichier source au choix en code natif ou en byte-code.
+     La compilation en byte-code a pour avantage que l'ex&eacute;cutable pourra &ecirc;tre
+     ex&eacute;cut&eacute; ind&eacute;pendament sur n'importe quel syst&egrave;me d'exploitation o&ugrave; la machine virtuelle
+@@ -2039,9 +2039,8 @@
+ 
+   <div>
+     Dans le programme pr&eacute;c&eacute;dent, l'expression
+-    <code>
+-    int_of_string <span class="Mod">Sys</span>.argv.<span class="Stat">(</span><span class="Const">1</span><span class="Stat">)</span>
+-    </code> est susceptible de produire 2 types d'exceptions&nbsp;:<br />
++    <code>int_of_string <span class="Mod">Sys</span>.argv.<span class="Stat">(</span><span class="Const">1</span><span class="Stat">)</span></code>
++    est susceptible de produire 2 types d'exceptions&nbsp;:<br />
+     <code>
+     Exception: Invalid_argument "index out of bounds"
+     </code><br />
+@@ -2124,13 +2123,13 @@
+   <div>
+     Vous pouvez lire cette excellente
+     <a href="https://www.good-eris.net/formation-ocaml/intro.html"
+-       >"Introduction au langage OCaml"</a> par Maxence Guesdon
+-     sous licence CC-by-nc-sa.
++      >"Introduction au langage OCaml"</a> par Maxence Guesdon
++    sous licence CC-by-nc-sa.
+   </div>
+ 
+   <div>
+     <a href="https://homepages.loria.fr/EHainry/cours/m4208/introcaml.html"
+-      >cours d'introduction &agrave; ocaml</a> par Emmanuel Hainry.
++      >Cours d'introduction &agrave; ocaml</a> par Emmanuel Hainry.
+   </div>
+ 
+   <div>
+@@ -2147,19 +2146,63 @@
+ 
+   <div>
+     <a href="https://fr.wikibooks.org/wiki/Objective_Caml"
+-      >Wikibook sur ocaml</a> par divers auteurs&nbsp;:
++      >Wikibook sur ocaml</a> (par divers auteurs&nbsp;:
+     <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Bases&offset=&limit=500&action=history"
+       >1</a> /
+     <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Structures&offset=&limit=500&action=history"
+       >2</a> /
+     <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Modules&offset=&limit=500&action=history"
+-      >3</a>.
++      >3</a>)
+   </div>
+ 
+   <div>
+     Comm<span></span>ent utiliser les structures de type 
++    <!--
+     <a href="https://v2.ocaml.org/learn/tutorials/set.fr.html">Set</a>, et
+     <a href="https://v2.ocaml.org/learn/tutorials/map.fr.html">Map</a>.
++    -->
++    <a href="https://ocaml.org/docs/sets">Set</a>, et
++    <a href="https://ocaml.org/docs/maps">Map</a>.
++  </div>
++
++  <hr />
++
++  <h4 id="def_more_docs">Autres documentations</h4>
++
++  <div>
++    D'autres documentations disponibles sur internet&nbsp;:
++  </div>
++
++  <div>
++    Le <a href="https://ocaml.gelez.xyz/">Cours alternatif d’OCaml</a>
++    d'Ana Gelez (et quelques autres contributeurs) sous licence GPL3.
++  </div>
++
++  <div>
++    <a href="https://www.labri.fr/perso/vpenelle/Enseignement/VerificationDesLogiciels/Tuto-Ocaml.html"
++    >Rapide tuto sur OCaml</a>
++    de Vincent Penelle.
++  </div>
++
++  <div>
++    Fiches pour l'informatique&nbsp;:<br />
++    <a href="https://kxs.fr/fiches/ocaml/">Aide mémoire OCaml</a>
++    <br />
++    par Thomas Beline, sous la licence CC-by-sa&nbsp;4.0.
++  </div>
++
++  <div>
++    OCaml: Learn &amp; Code<br />
++    Apprendre OCaml<br />
++    <a href="https://ocaml-learn-code.com/learn/index_fr.html"
++      >Apprendre OCaml avec des flashcards</a> (par Nathan Fallet)
++  </div>
++
++  <div>
++    <a href="https://learnxinyminutes.com/ocaml/"
++     >Learn X in Y minutes<br />
++      Where X=OCaml</a>,
++    (CC-by-sa 3.0)
+   </div>
+ 
+ 
