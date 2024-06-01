@@ -1,0 +1,64 @@
+--- didacticiel-ocaml-05.html	2026-05-10 09:43:53.948275625 +0200
++++ didacticiel-ocaml-06.html	2026-05-10 09:43:53.962275624 +0200
+@@ -161,7 +161,7 @@
+     <li><a href="#def_tailrec">R&eacute;cursivit&eacute; Terminale</a></li>
+     <li><a href="#def_script">Script et ex&eacute;cutable</a></li>
+     <li><a href="#def_main">Main</a></li>
+-    <li><a href="#def_exn">Exceptions</a></li>
++    <li><a href="#def_exn">Les Exceptions</a></li>
+     <li><a href="#def_further">Aller plus loin</a></li>
+     <li><a href="#def_notice">Notice d'utilisation</a></li>
+   </ul>
+@@ -1770,7 +1770,7 @@
+     d'un appel de fonction, donc le calcul ne peut &ecirc;tre r&eacute;alis&eacute;
+     aussit&ocirc;t car il faut d'abord calculer le r&eacute;sultat de cette
+     fonction, le calcul est donc laiss&eacute; en suspend en attendant.
+-    Or il y aurra autant de calcul laiss&eacute;s en suspend que d'appel total
++    Or il y aura autant de calcul laiss&eacute;s en suspend que d'appel total
+     &agrave; la fonction, ce nombre correspondant ici &agrave; la valeur du
+     param&egrave;tre.<br />
+     Donc pour cent mille, il y aurra cent mille appels successifs &agrave; la
+@@ -1803,7 +1803,7 @@
+ <span class="Stat">val</span> addt : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+ <span class="PreProc">#</span> addt <span class="Const">100_000</span> <span class="Stat">;;</span>
+-- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">705082704</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5000050000</span>
+ </pre>
+ 
+   <div>
+@@ -1933,7 +1933,7 @@
+ </pre>
+ 
+   <div>
+-    Et pour ce qui est de cr&eacute;er des ex&eacute;cutables pour de meilleures performences,
++    Et pour ce qui est de cr&eacute;er des ex&eacute;cutables pour de meilleures performances,
+     vous pouvez compiler votre fichier source au choix en code natif ou en byte-code.
+     La compilation en byte-code a pour avantage que l'ex&eacute;cutable pourra &ecirc;tre
+     ex&eacute;cut&eacute; ind&eacute;pendament sur n'importe quel syst&egrave;me d'exploitation o&ugrave; la machine virtuelle
+@@ -1977,6 +1977,8 @@
+ 
+   <h2 id="def_main">Main</h2>
+ 
++  <h4>Point d'entrée du programme</h4>
++
+   <div>
+     Pour organiser les &eacute;l&eacute;ments dans un script ou un programme ocaml,
+     il est recommand&eacute; de proc&eacute;der comme suit.
+@@ -2033,7 +2035,7 @@
+   <!-- ======================================================== -->
+   <hr />
+ 
+-  <h2 id="def_exn">Exceptions</h2>
++  <h2 id="def_exn">Les Exceptions</h2>
+ 
+   <div>
+     Dans le programme pr&eacute;c&eacute;dent, l'expression
+@@ -2157,7 +2159,6 @@
+   <div>
+     Comm<span></span>ent utiliser les structures de type 
+     <a href="https://v2.ocaml.org/learn/tutorials/set.fr.html">Set</a>, et
+-    comment utiliser les structures de type 
+     <a href="https://v2.ocaml.org/learn/tutorials/map.fr.html">Map</a>.
+   </div>
+ 
