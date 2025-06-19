@@ -1,0 +1,4423 @@
+--- didacticiel-ocaml-08.html	2026-05-10 09:43:53.986275624 +0200
++++ didacticiel-ocaml-09.html	2026-05-10 09:43:53.994275623 +0200
+@@ -1,2868 +1,2222 @@
+-<!DOCTYPE HTML>
++<!DOCTYPE html>
+ <html>
+ <head>
+-<title>How to call C functions from OCaml</title>
+-<link href="./ocaml-icon.png" rel="shortcut icon" />
+-<meta name="description" content="How to mix OCaml and C" />
+-<meta name="keywords" content="ocaml c api ffi bindings lib" />
+-
+-<style type="text/css" media="screen"> 
+-body { background:#D2D2D2; color:#222; padding-bottom:2%; margin-left:2%; margin-right:16%; }
+-code { background:#B4B4B4; color:#000; }
+-div { margin:0.6em 3.8em 0.4em 3.2em; }
+-pre { background:#AAA; color:#000; padding-left:0.5em; margin-left:1.2em; margin-right:8%; }
+-hr { margin:2em 0; }
+-#footer, #ref_copy { font-size:0.8em; margin-left:4.8em; }
+-a { text-decoration:none; color:#D40; }
+-a:hover { color:#A00; }
+-li a { text-decoration:none; color:#094; font-weight:bold; }
+-li a:hover { color:#062; }
+-ul { margin-left:4%; }
+-div.home a { color:#37B; font-weight:bold; }
+-div.home a:hover { color:#38C; background:#ddd; }
+-h2.keywords { display:none; }
+-h2 { font-size:1.2em; }
+-h3 { font-size:1.1em; }
+-h2, h3 { margin-left:1.4em; margin-top:1.4em; color:#BBE; }
+-h2 span, h3 span{ padding-left:0.8em; padding-right:0.6em;
+-background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAAfCAIAAABCnIs2AAAAYklEQVQI102PMQ7EQBCDyMj/b/ezO+aKpLjWEiA/5xxgAGAQMbXIFKChWxm3yzu2UYGsDoS2kPYFWCGtDwxFyG0pkT44VGUuqmF34XOOIg5ozb3CDlwkqjoKkN0v1P8PAPwAwL1biuEGmGcAAAAASUVORK5CYII=") top left repeat-x;
++  <title>Introduction &agrave; OCaml</title>
++  <meta http-equiv="content-type" content="text/html; charset=utf8" />
++  <meta charset="UTF-8" />
++  <meta name="viewport" content="width=device-width" />
++  <meta name="keywords" content="ocaml, tutoriel, didactitiel, documentation, d&eacute;butant" />
++<style type="text/css">
++body {
++  color:#000;
++  background-color:#bbb;
++  padding:1em 9em 2em 2em;
++}
++a {
++  color:#66B;
++  font-weight:bold;
++  text-decoration:none;
++}
++div.notice {
++  font-size:0.8em;
++}
++span.mode {
++  font-size:1.1em;
++  font-style:italic;
++}
++span.detl {
++  font-size:0.8em;
++  margin-left:0.6em;
++  padding-left:0.6em;
++}
++ul#modes li {
++  margin-bottom:0.5em;
++}
++hr {
++  margin-top:2.4em;
++  margin-bottom:1.4em;
++  max-width:76%;
++  min-width:920px;
++  text-align:left;
++  margin-left:0;
++}
++div {
++  padding:0.4em 1.4em;
++  margin: 0.4em 1.4em;
++  max-width:70%;
++  min-width:820px;
++}
++div.nb {  /* no spacing at the bottom */
++  padding:0.8em 1.2em 0 1.4em;
++  margin: 0.8em 1.2em 0 1.4em;
++}
++div.nt {  /* no spacing at the top */
++  padding:0 1.2em 0.6em 1.4em;
++  margin: 0 1.2em 0.6em 1.4em;
++}
++div.nbnt {  /* no spacing at the bottom and at the top */
++  padding:0 1.2em 0 1.4em;
++  margin: 0 1.2em 0 1.4em;
++}
++pre {
++  padding:0;
++  margin:0;
++  max-width:74%;
++  min-width:900px;
++}
++code,
++pre {
++  background:#111;
++  color:#EEE;
++}
++
++.Type              { color:#00ff00; font-weight:bold; }
++.Module,    .Mod   { color:#8080ff; font-weight:bold; }
++.Constant,  .Const { color:#ff40ff; font-weight:bold; }
++.Statement, .Stat  { color:#ffff00; font-weight:bold; }
++.Comment,   .Comm  { color:#00ffff; font-weight:bold; }
++.Error,     .Err   { color:#ff0000; font-weight:bold; background-color:#ee6060; }
++.Alert,     .Al    { color:#ff0000; font-weight:bold; }
++.PreProc,   .PP    { font-weight:bold; }
++
++/*  vim cmd
++
++:%s/="S tatement"/="Stat"/g
++:%s/="C onstant"/="Const"/g
++:%s/="C omment"/="Comm"/g
++:%s/="M odule"/="Mod"/g
++:%s/="E rror"/="Err"/g
++*/
++
++
++#contact {
++  width:221px; height:18px; display:block;
++  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN0AAAASCAYAAADfett7AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAiZSURBVGiB7dp7sNVVFQfwD/kKyRB8pImChhaaT8RJLSUd7KnUlGFaZj5HKx9Rappj/pHE9NDMEjMNlRFxFLV8FWkZYVooPgJzSiOfCQIVig9Q+uO7T+d3f5x74V7uTZnud+bMOb+912/vtfd67LXWPvSiF73oRS960Ys3Lo7Bcqzbg3MMw514oczV+Py+B+dcXfTDBp2g3xCboU/PsNMjGIfHK8/biVxGvT7srDre9HozsJqYj3tls3sKP8R6Iszdy+fWHpyvO3A5frYSmqH4MZ7FIjyDl/Bza4Di4ik89Hoz0YuewQJ8rdY2yRv7pLsWv+6g/zg5uSdhX2yCdbAtTpM1T7BmOeU15qSr4gj8ANuIMO7HDdih9B8qgrwHZ2Pt2vvr4+uYgQcxRU6FKj6FSyWUuaTMcYsVN+rj4q03EeHPktPlwzW6/XFNC17GlHEfxO34XK1/7/LeIHwbM3FhjeY9hWYZHii/x5W+VkY3EOPxh0J/mShCFV/At7A9rir8jSl9A/DNMu6DuLLQVXEWTsVwXC/7cnVtnjPwBOYVnq/B2Er/ERIh7K19vK3w8P0WfQfjjrLGS7GF7MdBFZqx+AZ2xlSR81XYSkLYEzBddOUkbcPavjgRN5b13YHviC5UcSguqjx3xuh2E/26X+Q1EbtU+tcta5gu+zAV+9TG+JDo+CaFj/vxC7yv9I8SnZ2J8yXkR1tPtosowG1ydF8u+cw0fBVfxs34nRjXWZV318JNOBO/FYMaXGj3rdDtIEL7lYQyl4mx3iYCamBYhe41/FQ88U0YUaHbptBV1zFOFPZxMaSHCj/nVGi2Ku/dJGHWFFGiKhZphq5Plt9/1hpvKes+pow5UYz2nrKWBkaIskzDc7hCDGAg7sZhomwXFR7v1nR6RPCfx3WiDJPEAO+UfYS/4p9YXHi+F4+Wvk3FkA4RhYfROE8c6SAcK0p3UPldVcbPihEvEge9WGR0MN5Zoduz0N4g+38VRpa9GVfor8PsMvfRlXc3w5GixBeW8cfgNxLmN7AjPqLzOFAc2zDZv4ml/f3luw8mi3OcKU5/gBj/6Mo425Z13KqpowNEl4+TtOTOsuajtXUQ/8X5omAfrbQNL21/0XbBl+Dvlecxhe7gStub8bAIvYFzCt3hNbp5Zf4Gzih0x1Ta1hHlrzJfL6TsLBtwVG1tJ+FlbFyeP13e+5GV40VxOlXUT7pTy7x7VNoGiGFNrbRNLPMeWBvvAsmtqt58LfH0Uypt0/CKtob8bivufXvh5Zna5npnS5h5MX4i+7tA01Fehu9W+Hnairni6WX+6h5di1dFfxoYXehmaOskb8VdledWxZx3yP5WT9OuFFLWLWuYLvrUCvuXcY6vtK0tDnBuhb8TC92JFbpNRT6LtJXl6Vgqur5CzL5YLLOBB2Sx14vSNjBLvGKD8b3EY19boXlJlGxXTS9MhHF1je4BbF3jZbl4yAaWlnmHaB+jC93NovSNz+2y4TvW6C/tYKzOYC/cJ6FKA4vkVKiHcfOlWFHFx/BLCWUbPL+1tNVD9HvFmTXwJzGc+v61wgGFJ+KAzhCHeZx447Fy6jYwS/OkHYTN5XSu4vJ25npEW4c7q3xPEZ2qtg+pPC8XvRwpJ95p+KSssXqadgUjZA3fEz1phb3EcKq6sUwzetuiRj+58nueOK7bRc4NzBLD3ZIVc6F5tedlhbn5tfYXZWPWK/2DxevUq4hzxTMMwZzStqgsqooXtDVMeL601+k21z62FON6pp3+rWrPT3UwVmcwGI+1aP+beL9+mmupz9lHBPmZ8qmjrhx1GcESK+5fKwwqPJHTso+2ldgbtZXhctGBxrvkpKjiH+JI62ilM+219608byX5+BD8UaKFhiFu1GKezqBhMI92QDNY9Keuo3PL99ZiWApfrdbT3trXZ0Wj6yoWSphTx4bl+7lummdlWIJ/ibd+bSW0tFaWrmCB5lqrGFB4WtLBnMvltL9Y8uaVYXWuR17SjE6WiPzXq/DXV9vwbh/Ja2ga+8baYqCEnt3F51j0F+VfUNr6SBS2umiMMbADmoVay7LRtqBFXx0drr27SsJzxDMNrbWPEqtv5Z17AneJwEb+j+Zr4GEJA+vCGlX6VqaAM6Qy212X/EuU/KGGR6RyR2T2rIRvRLGrVyOHi9FNKM9zpUBTLSaQ0Lg7sZ2kG1Xl3lOl+rcamCmRQz2nrmKO6NCIWvsB4rRaRTSdQncZ3ZX4t8T775J/Q5wspf8LummOVcFUya0mStK9QfmMkEJN33bfjMdfKPF+ZzFBlPwKCY8GSvVrd63L7nWcI8WCyRL2rY23Sy7zpS7w8zB2EgMZLlVekpsfKSfTi1JwOlkMaq4Y5JOyj6fgAxI+EmUdL1cO48QgTxBDXab7/qAwu4z93sLnHlLkebmjl9rBOJFp//I8X4pnX5R1byQh30gpoJCq6lOS0+0kxn6UrHuCGN5qobvCy2elfDtRM8l/RRR4XDvv9ASW4oOysVM1w56lUr7tKOTsI+HgquRGdczGJyREbFR1X5Cq5pWr8P4MqRpfoJn7kgjh3C7wc5EY2yVSRbtODHiyGMlZco92i+QowyXXvg/7SU4zu8W44zXv2U6RQslhhf+FXeCzFc6V65bp5fl5qT6f3YWx+opMqyHzV8RJjJPrChIZHFt+L5Y7uEma10iviuGf3gUeehx95P5iV537719PoH/hY5iuGVJXsJZcaO+s41O1IwwRIxikda60uhgmodt4rXlcR06CVnlNK+wup9zI7mCuoFF820nX93Fl6Cdy2r6DObaR039V96IXvWgXQyX/fVouoI+XK4Pz5N8ssyRNqGNLuURupCVD5Q8AT2h7j9uLDrAm/au8F92P/SQtGCqn6mNyTztN6xxtN7kkXi7h84DyziFS3u/FKqDX6HrRWfSTkKy/5PJzdN/Vy/8F/gNf/RRvVGFq6AAAAABJRU5ErkJggg==") top left no-repeat;
+ }
+-#contact { display:none; }
+-.for_screen { }
+-.for_print { display:none; }
+-</style>
+-
+-<style type="text/css" media="print">
+-body { background:#FFF; color:#000; }
+-code { background:#FFF; color:#008; }
+-pre { margin-left:3.0em; background:#FFF; color:#008; }
+-div { margin-left:1.0em; }
+-div { font-size:0.7em; }   /* size of text in the paragraphs */
+-pre { font-size:0.7em; }   /* size of text in the code fragment */
+-a { text-decoration:none; color:#080; }
+-h1, h2, h3, h4 { color:#004; background:#0FF; }
+-h2.keywords { display:none; }
+-#footer, #ref_copy { font-size:0.6em; color:#777; }
+-.for_screen { display:none; }
+-.for_print { }
+-#contact { display:none; }
+ </style>
+ </head>
+ <body>
+ 
+-  <h1>How to call C functions from OCaml</h1>
++
++  <h1>Introduction &agrave; OCaml</h1>
+ 
+   <div>
+-    This document is a small tutorial that introduces how to call
+-    C functions from OCaml using its C API.
+-    This is usefull if you want to make a mixed C and OCaml application,
+-    if you want to call some functions you need from a C library,
+-    or to write a complete binding to a C library.
++    OCaml (anciennement Objective Caml) est un langage de script et de programmation.
++    Ce document &agrave; pour but d'en proposer une introduction simple, concise et
++    d'&ecirc;tre accessible &agrave; tous, et ce, m&ecirc;me sans connaissances
++    pr&eacute;alable en programmation ou scripting.
+   </div>
+ 
+-  <h2 class="keywords">Compiling a C/OCaml library</h2>
+-  <h2 class="keywords">Mixing C and OCaml</h2>
+-  <h2 class="keywords">Compile C with OCaml</h2>
+-  <h2 class="keywords">OCaml bindings to C library</h2>
+-  <h2 class="keywords">OCaml's C API</h2>
++  <!--
++  <div>
++    Si vous &ecirc;tes d&eacute;butant et que vous ne comprennez pas certaines parties,
++    n'h&eacute;sitez pas &agrave;
++    me le signaler, ou &agrave; me demander des pr&eacute;cisions
++    sur certains points, ou au contraire &agrave; en apporter pour enrichir ce didacticiel
++    <div id="contact">&nbsp;</div>
++  </div>
++  -->
+ 
+-  <hr />
++  <div>
++    Si vous &ecirc;tes d&eacute;butant et que vous ne comprennez pas certaines parties,
++    vous pouvez poser des questions sur
++    <a href="https://discuss.ocaml.org/">discuss.ocaml.org</a>.
++  </div>
++
++  <div>
++    Tout d'abord une courte pr&eacute;sentation d'OCaml.
++    Il s'agit d'un projet initi&eacute; par l'INRIA
++    (<a href="http://www.inria.fr/">inria.fr</a>,
++    <a href="http://fr.wikipedia.org/wiki/INRIA">wp</a>).
++    <br />
++    Le langage OCaml fournit une bonne suret&eacute; d'ex&eacute;cution notament
++    gr&acirc;ce &agrave; son syst&egrave;me de typage de variables, qui permet
++    par exemple d'éviter de passer en param&egrave;tre &agrave; une fonction une
++    cha&icirc;ne de charact&egrave;re l&agrave; o&ugrave; il faut passer un nombre.
++  </div>
+ 
+-  <h3><span>Contents</span></h3>
++
++  <!-- ======================================================== -->
++  <hr />
+ 
+   <ul>
+-    <li><a href="#ref_hello_world"><span>Hello World</span></a></li>
+-    <li><a href="#ref_quick_start"><span>Quick start</span></a></li>
+-    <li><a href="#ref_compile"><span>Compiling C and OCaml together</span></a></li>
+-    <li><a href="#ref_basic_types"><span>Returning Basic Types</span></a></li>
+-    <li><a href="#ref_tuple_access"><span>Accessing Tuples</span></a></li>
+-    <li><a href="#ref_array_access"><span>Accessing Arrays</span></a></li>
+-    <li><a href="#ref_list_access"><span>Accessing Lists</span></a></li>
+-    <li><a href="#ref_create_tuple"><span>Creating Tuples and Arrays</span></a></li>
+-    <li><a href="#ref_create_list"><span>Creating Lists</span></a></li>
+-    <li><a href="#ref_create_float_arr"><span>Creating Floats arrays</span></a></li>
+-    <li><a href="#ref_enums"><span>Enums / Variants</span></a></li>
+-    <li><a href="#ref_bitfield"><span>Convert C bit fields</span></a></li>
+-    <li><a href="#ref_rawdata"><span>Exchanging Raw Data</span></a></li>
+-    <li><a href="#ref_5params"><span>More than 5 parameters</span></a></li>
+-    <li><a href="#ref_exception"><span>Raising Exceptions</span></a></li>
+-    <li><a href="#ref_ptr"><span>Pointers to C structures</span></a></li>
+-    <!--
+-    <li><a href="#ref_finalise"><span>Finalisation of C objects</span></a></li>
+-    -->
+-    <li><a href="#ref_custom"><span>Custom Operations Structure</span></a></li>
+-    <li><a href="#ref_custfinal"><span>Custom Finalisation</span></a></li>
+-    <li><a href="#ref_constvrnt"><span>Variants with arguments</span></a></li>
+-    <li><a href="#ref_option"><span>The type 'a option</span></a></li>
+-    <li><a href="#ref_optlabel"><span>Optional labeled parameter</span></a></li>
+-    <li><a href="#ref_plmvrnt"><span>Polymorphic Variants</span></a></li>
+-    <li><a href="#ref_linklib"><span>Linking against a library</span></a></li>
+-    <li><a href="#ref_mlfromc"><span>Call Caml functions from C</span></a></li>
+-    <li><a href="#ref_bootfromc"><span>Start-up from C</span></a></li>
+-    <li><a href="#ref_cplusplus"><span>Mixing with C++</span></a></li>
+-    <li><a href="#ref_mswindows"><span>MS Windows</span></a></li>
+-    <li><a href="#ref_conclusion"><span>Conclusion, going further</span></a></li>
+-    <li><a href="#ref_licence"><span>Licence of this document</span></a></li>
+-    <li><a href="#ref_version"><span>Version of this document</span></a></li>
+-  <!--
+-    <li><a href="#ref_misc"><span>Miscellaneous</span></a></li>
+-  -->
++    <li><a href="#def_intractif">L'interpr&eacute;teur interactif</a></li>
++    <li><a href="#def_tprim">Les types primitifs</a></li>
++    <li><a href="#def_transtypage">Le Transtypage</a></li>
++    <li><a href="#def_val">D&eacute;finir une valeur</a></li>
++    <li><a href="#def_tableaux">Les Tableaux</a></li>
++    <li><a href="#def_list">Les Listes</a></li>
++    <li><a href="#def_tuple">Les Tuples</a></li>
++    <li><a href="#def_func">Les Fonctions</a></li>
++    <li><a href="#def_if">Condition if</a></li>
++    <li><a href="#def_for">La Boucle for</a></li>
++    <li><a href="#def_funcloop">Les Boucles avec des Fonctions</a></li>
++    <li><a href="#def_match">Filtrage avec match</a></li>
++    <li><a href="#def_iter">Iteration sur les Listes et les Tableaux</a></li>
++    <li><a href="#def_record">Les Enregistrements</a></li>
++    <li><a href="#def_record_imup">Les Enregistrements&nbsp;: Mise &agrave; Jour Immuable</a></li>
++    <li><a href="#def_variant">Les Variants</a></li>
++    <li><a href="#def_warnarr">Mise en garde contre les tableaux</a></li>
++    <li><a href="#def_strings">Les cha&icirc;nes de caract&egrave;res</a></li>
++    <li><a href="#def_tailrec">R&eacute;cursivit&eacute; Terminale</a></li>
++    <li><a href="#def_script">Script et ex&eacute;cutable</a></li>
++    <li><a href="#def_main">Main</a></li>
++    <li><a href="#def_exn">Les Exceptions</a></li>
++    <li><a href="#def_further">Aller plus loin</a></li>
++    <li><a href="#def_notice">Notice d'utilisation</a></li>
+   </ul>
+ 
++  <hr />
++  <!-- ======================================================== -->
+ 
+ 
+-  <!-- ========================================================= -->
+-
+-  <hr />
++  <h4 id="def_difmodexe">Les diff&eacute;rents modes d'ex&eacute;cution</h4>
+ 
+-  <h3 id="ref_hello_world"><span>Hello World</span></h3>
++  <div>
++    OCaml fournit plusieurs modes d'ex&eacute;cution possibles&nbsp;:
++  </div>
+ 
+-  <div>The two files "hello.ml" and "hello_stubs.c":</div>
++  <ul id="modes">
++    <li>
++      <span class="mode">en <b>binaire</b>, code natif compil&eacute;</span><br />
++      <span class="detl">(comme le C et avec des performances &eacute;quivalentes)</span>
++    </li>
++    <li>
++      <span class="mode">en <b>bytecode</b> ex&eacute;cut&eacute; &agrave; l'aide d'une <b>machine virtuelle</b></span><br />
++      <span class="detl">(comme Java et avec des performances &eacute;quivalentes)</span>
++    </li>
++    <li>
++      <span class="mode">en <b>interpr&eacute;t&eacute;</b> avec l'interpr&eacute;teur</span><br />
++      <span class="detl">(comme Python, Perl, Ruby ou PHP et avec des performances &eacute;quivalentes)</span>
++    </li>
++    <li>
++      <span class="mode">en <b>interactif</b> avec une boucle d'interaction nomm&eacute;e "toplevel"</span><br />
++      <span class="detl">(comme avec la commande 'python')</span>
++    </li>
++  </ul>
+ 
+-<pre>
+-external print_hello: unit -&gt; unit = "caml_print_hello"
+ 
+-let () =
+-  print_hello ()
+-</pre>
++  <div>
++    Tous ces modes d'ex&eacute;cution seront vus plus en d&eacute;tail ult&eacute;rieurement. <!-- TODO -->
++    Dans ce premier &eacute;pisode nous n'utiliserons que la boucle interactive.
++  </div>
+ 
+-<pre>
+-#include &lt;stdio.h&gt;
+-#include &lt;caml/mlvalues.h&gt;
+ 
+-CAMLprim value
+-caml_print_hello(value unit)
+-{
+-    printf("Hello\n");
+-    return Val_unit;
+-}
+-</pre>
+ 
+-  <div>Compile and run:</div>
+-<pre>
+-$ ocamlopt -o hello.opt hello.ml hello_stubs.c
+-$ ./hello.opt 
+-Hello
+-</pre>
++  <h4 id="def_styles">Les styles de programmation</h4>
+ 
++  <div>
++    OCaml offre de plus la possibilit&eacute; d'adopter la plupart des styles de
++    programmation&nbsp;: fonctionnel, imp&eacute;ratif, objet, modulaire et de les m&eacute;langer.
++    Malgr&eacute; tout OCaml se pr&ecirc;te particuli&egrave;rement bien au style de
++    programmation fonctionnel, car utilis&eacute; correctement, les effets de
++    bord &eacute;tant alors &eacute;vit&eacute;s, et associ&eacute; &agrave; la cat&eacute;gorisation
++    des variables, la suret&eacute; d'ex&eacute;cution est alors excellente, et il est virtuellement
++    possible de r&eacute;aliser des logiciels garantis sans aucuns bugs.
++  </div>
+ 
++  <div>
++    Voici pour vous mettre l'eau &agrave; la bouche et vous donner l'envie de
++    continuer. Maintenant pour pouvoir suivre le premier volet de cette
++    initiation, t&eacute;l&eacute;chargez et installez OCaml &agrave; partir
++    de cette adresse
++    <a href="https://ocaml.org/docs/install.fr.html"
++            >https://ocaml.org/docs/install.fr.html</a>
++    ou bien &agrave; l'aide de l'installeur fournit par votre distribution.
++  </div>
+ 
+-  <!-- ========================================================= -->
++  <div id="def_get_src">
++    Ou encore &agrave; partir des sources qui sont disponibles par exemple ici&nbsp;:
++    <br />
++    <a href="https://caml.inria.fr/pub/distrib/"
++            >https://caml.inria.fr/pub/distrib/</a>
++  </div>
+ 
+   <hr />
++  <!-- ======================================================== -->
++
+ 
+-  <h3 id="ref_quick_start"><span>Quick start</span></h3>
++  <h3 id="def_intractif">Lancez l'interpr&eacute;teur intractif</h3>
+ 
+   <div>
+-    Let's start with the simpler case one can find,
+-    calling a C function with an integer parameter.
+-    This is achieved in an .ml file by this line:
++    Maintenant la premi&egrave;re chose &agrave; faire est de commencer &agrave; se
++    familiariser avec le syst&egrave;me de typage d'OCaml. Rassurez-vous, m&ecirc;me si
++    vous trouverez peut-&ecirc;tre cela contraignant au d&eacute;but, on int&egrave;gre tr&egrave;s
++    vite ce syst&egrave;me pour l'utiliser de mani&egrave;re naturelle.
++  </div>
++
++  <div class="nb">
++    Pour commencer &agrave; s'y frotter, le meilleur moyen est d'utiliser
++    l'interpr&eacute;teur interactif (le "toplevel"). Pour cela commencez une
++    nouvelle session en tapant dans votre console la commande 'ocaml'.
++    La version d'OCaml sera alors affich&eacute;e en guise d'introduction,
++    suivie du prompt d'OCaml qui attendra que vous entriez la premi&egrave;re
++    expression&nbsp;:
+   </div>
+ <pre>
+-external send_an_int: int -&gt; unit = "get_an_int"
++[guest@localhost &tilde;]$ ocaml
++        <span class="Stat">OCaml version 4.11.1</span>
++
++#
+ </pre>
++
+   <div>
+-    The external keyword tells the compiler that the function comes
+-    from outside the OCaml world. The compiler needs the function
+-    name which will be seen from the OCaml area, its type, and the name
+-    of the C function which will be called.
++    Toutes les expressions ou suite d'expressions doivent
++    se terminer par deux points virgule comme ceci '<code><span class="Stat">;;</span></code>'.
+   </div>
+ 
+   <div>
+-    In the C source file, define a C function whose name is that
+-    given in the OCaml side between quotes. This function must have return type
+-    <code>CAMLprim value</code> and its parameter type has to be <code>value</code>.
+-    All parameters given to C functions from OCaml are of type <code>value</code>.
+-    The include header <code>&lt;caml/mlvalues.h&gt;</code> provides conversion
+-    macros to convert the type <code>value</code> to C native types.
+-    In this case to convert to a C integer, that macro is <code>Int_val()</code>.
+-    Then as the return value of the OCaml function is <code>unit</code>, the C
+-    function have to return a unit, which is done with the macro <code>Val_unit</code>.
++    Pour comprendre le syst&egrave;me de typage nous allons tout d'abord voir
++    les types primitifs qui sont les &eacute;l&eacute;ments de base.
++  </div>
++
++
++  <div class="nb">
++    Vous pouvez &eacute;galement am&eacute;liorer les capacit&eacute;s d'&eacute;dition
++    de l'interpr&eacute;teur interactif en utilisant <code>rlwrap</code> (que vous devez
++    &eacute;galement installer si vous voulez l'utiliser)&nbsp;:
+   </div>
+ <pre>
+-#include &lt;stdio.h&gt;
+-#include &lt;caml/mlvalues.h&gt;
++[guest@localhost &tilde;]$ rlwrap ocaml
++        <span class="Stat">OCaml version 4.11.1</span>
+ 
+-CAMLprim value
+-get_an_int( value v )
+-{
+-    int i;
+-    i = Int_val(v);
+-    printf("%d\n", i);
+-    return Val_unit;
+-}
++#
+ </pre>
+-  <div>
+-    Of course, think to include the C headers you need, the standard library
+-    or other libraries.
+-  </div>
+ 
+ 
++  <!-- ======================================================== -->
++  <hr />
+ 
+-  <!-- ========================================================= -->
+ 
+-  <h3 id="ref_compile"><span>Compiling C and OCaml together</span></h3>
++  <h4 id="def_tprim">Les types primitifs</h4>
+ 
+-  <div>
+-    Then to compile these two files together, here are the command lines
+-    you will need:
++  <div class="nb">
++    1) Le type entier (d&eacute;cimal), tapez au prompt&nbsp;:
+   </div>
+ <pre>
+-ocamlc -i funs.ml &gt; funs.mli
+-ocamlc -c funs.mli
+-ocamlc -c funs.ml
+-ocamlc -c wrap.c
+-ocamlmklib  -o  wrap_stubs  wrap.o
+-ocamlc -a  -custom  -o funs.cma  funs.cmo  -dllib dllwrap_stubs.so
++# <span class="Const">6</span> <span class="Stat">;;</span>
+ </pre>
+-  <div>
+-    But it will be more handy with a basic <code>Makefile</code>:
++  <div class="nbnt">
++    OCaml vous indiquera alors en r&eacute;ponse le type de l'expression que
++    vous venez d'entrer, suivit de sa valeur&nbsp;:
+   </div>
+ <pre>
+-wrap.o: wrap.c
+-        ocamlc -c $&lt;
+-
+-dllwrap_stubs.so: wrap.o
+-        ocamlmklib  -o  wrap_stubs  $&lt;
+-
+-funs.mli: funs.ml
+-        ocamlc -i $&lt; &gt; $@
+-
+-funs.cmi: funs.mli
+-        ocamlc -c $&lt;
+-
+-funs.cmo: funs.ml funs.cmi
+-        ocamlc -c $&lt;
+-
+-funs.cma:  funs.cmo  dllwrap_stubs.so
+-        ocamlc -a  -o $@  $&lt;  -dllib -lwrap_stubs
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">6</span>
++</pre>
+ 
+-funs.cmx: funs.ml funs.cmi
+-        ocamlopt -c $&lt;
+ 
+-funs.cmxa:  funs.cmx  dllwrap_stubs.so
+-        ocamlopt -a  -o $@  $&lt;  -cclib -lwrap_stubs
+ 
+-clean:
+-        rm -f *.[oa] *.so *.cm[ixoa] *.cmxa
+-</pre>
+-  <div>
+-    And if you use a library in the file wrap.c, you need to add some
+-    extra compilation instructions to link against the library,
+-    which is described in
+-    <span class="for_screen">
+-      <a href="#ref_linklib">another paragraph below</a>.
+-    </span>
+-    <span class="for_print">
+-      the section <strong>Linking against a library</strong>.
+-    </span>
++  <div class="nb">
++    2) Le type nombre &agrave; virgule (flottante)&nbsp;:
+   </div>
+-  <div>
+-    Just a detail about the command <code>ocamlc -c wrap.c</code>,
+-    you can replace this line by one of the line below for cases when
+-    you wish to give extra arguments to gcc:
++<pre>
++# <span class="Const">8.2</span> <span class="Stat">;;</span>
++- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">8.2</span>
++</pre>
++  <div class="nbnt">
++    Le point est obligatoire pour indiquer le type flottant, m&ecirc;me s'il n'y a rien apr&egrave;s&nbsp;:
+   </div>
+ <pre>
+-ocamlc -c -cc "gcc -o wrap.o" wrap.c
+-gcc -c -I"`ocamlc -where`" wrap.c
++# <span class="Const">12.</span> <span class="Stat">;;</span>
++- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">12.</span>
+ </pre>
+-  <div>
+-    Also I would recommand trying to replace the command
+-    <code>ocamlc -c wrap.c</code> by <code>ocamlc -verbose -c wrap.c</code>
+-    so that the ocamlc compiler will print out all the internal commands
+-    that it will proceed.
++  <div class="nbnt">
++    Sinon, le nombre serait reconnu comme un entier&nbsp;:
+   </div>
++<pre>
++# <span class="Const">12</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">12</span>
++</pre>
+ 
+-  <div>
+-    Then you can test the result opening the .cma file in the top-level:
++
++
++  <div class="nb">
++    3) Le type bool&eacute;en, dont la valeur vaut soit vraie soit fausse&nbsp;:
+   </div>
+ <pre>
+-% ocaml funs.cma
+-
+-# open Funs;;
+-# send_an_int 9 ;;
+-9
+-- : unit = ()
++# <span class="Const">true</span> <span class="Stat">;;</span>
++- : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">true</span>
++# <span class="Const">false</span> <span class="Stat">;;</span>
++- : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">false</span>
+ </pre>
+ 
+-  <div>
+-    Or at your option from a test script:
++
++
++  <div class="nb">
++    4) Le type caract&egrave;re (un et un seul caract&egrave;re).
++    Ils sont indiqu&eacute;s entre guillemets simple&nbsp;:
+   </div>
+ <pre>
+-#load "funs.cma" ;;
+-open Funs ;;
+-
+-let () =
+-  send_an_int 5;
+-;;
++# <span class="Const">'e'</span> <span class="Stat">;;</span>
++- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'e'</span>
+ </pre>
+ 
+-  <div>
+-    You also have the option, if you just want to build a C-OCaml mixed application
+-    without to build an intermediate .cma / .cmxa binding, to directly compile the
+-    objects together:
++  <div class="nb">
++    5) Le type cha&icirc;ne de caract&egrave;res (z&eacute;ro ou plusieurs caract&egrave;res),
++    plac&eacute;es entre guillemets doubles&nbsp;:
+   </div>
+ <pre>
+-make wrap.o
+-make funs.cmx
+-ocamlopt wrap.o funs.cmx -o myapp
+-./myapp
++# <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+ </pre>
+ 
+-  <hr />
+-
+-  <div>
+-    OK, Now if everything works, let's see how to convert the other types.
+-    floating point numbers, and strings:
++  <div class="nb">
++    L'op&eacute;rateur de concat&eacute;nation des cha&icirc;nes de caract&egrave;re est&nbsp;:
+   </div>
+ <pre>
+-external send_a_float: float -&gt; unit = "get_a_float"
+-external send_a_string: string -&gt; unit = "get_a_string"
++# <span class="Const">&quot;OC&quot;</span> <span class="Stat">^</span> <span class="Const">&quot;aml&quot;</span><span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+ </pre>
+ 
++  <div class="nb">
++    Pour acc&eacute;der &agrave; un des caract&egrave;res d'une cha&icirc;ne de caract&egrave;res,
++    vous pouvez proc&eacute;der comme suit&nbsp;:
++  </div>
+ <pre>
+-CAMLprim value
+-get_a_float( value v )
+-{
+-    float f;
+-    f = Double_val(v);
+-    printf("%f\n", f);
+-    return Val_unit;
+-}
+-
+-CAMLprim value
+-get_a_string( value v )
+-{
+-    const char *s;
+-    s = String_val(v);
+-    printf("%s\n", s);
+-    return Val_unit;
+-}
++# <span class="Const">&quot;OCaml&quot;</span>.<span class="Stat">[</span><span class="Const">2</span><span class="Stat">]</span> <span class="Stat">;;</span>
++- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'a'</span>
+ </pre>
+-  <div>
+-    The <code>Double_val()</code> conversion macro can be used for both
+-    C floats and C doubles.
++  <div class="nt">
++    Comme vous pouvez le constater le type renvoy&eacute; est bien le type
++    caract&egrave;re <code>char</code> vu pr&eacute;c&eacute;demment.
++    L'index commence &agrave; z&eacute;ro pour le premier caract&egrave;re.
+   </div>
+ 
++  <div class="nb">
++    Si on tente d'acc&eacute;der &agrave; un caract&egrave;re au del&agrave; du dernier, une
++    exception est lev&eacute;e&nbsp;:
++  </div>
++<pre>
++# <span class="Const">&quot;OCaml&quot;</span>.<span class="Stat">[</span><span class="Const">26</span><span class="Stat">]</span> <span class="Stat">;;</span>
++<span class="Const">Exception</span>: <span class="Const">Invalid_argument</span> <span class="Const">&quot;index out of bounds&quot;</span>.
++</pre>
++
+   <div>
+-    The <code>Bytes_val()</code> conversion macro can be used for the
+-    new type <code>bytes</code>.
++    D&eacute;finir, lever et rattraper des exceptions sera vu ult&eacute;rieurement.
+   </div>
+ 
+ 
++  <div class="nb">
++    6) Le type &laquo;&nbsp;unit&nbsp;&raquo;&nbsp;:
++  </div>
++<pre>
++# <span class="Const">()</span> <span class="Stat">;;</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
++</pre>
+ 
+-  <!-- ========================================================= -->
+ 
+-  <hr />
++  <div>
++    Ce type est une sorte d'entit&eacute; vide, avec une valeur unique.
++    Il est utilis&eacute; par exemple lorsqu'une fonction ne prend pas d'argument
++    particulier. C'est &eacute;galement le type renvoy&eacute; par une fonction qui r&eacute;alise
++    une action mais ne renvoie aucune valeur particuli&egrave;re.
++    Ce type n'est pas &agrave; proprement parl&eacute; l'&eacute;quivalent de ce que l'on
++    retrouve sous le nom de &laquo;&nbsp;void&nbsp;&raquo; ou &laquo;&nbsp;NULL&nbsp;&raquo; dans d'autres langages,
++    car l'usage du type unit peut avoir d'autres usages.
++  </div>
+ 
+-  <h3 id="ref_basic_types"><span>Returning Basic Types</span></h3>
+ 
+-  <div>
+-    Now let's see how to return these basic types from C to OCaml.
++
++  <div class="nb">
++    Une fonction n'ayant pas une r&eacute;elle valeur de retour retourne le
++    type &laquo;&nbsp;unit&nbsp;&raquo;&nbsp;:
+   </div>
+ <pre>
+-external get_an_int: unit -&gt; int = "send_an_int"
++# print_endline <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
++<span class="Const">OCaml</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
++  <div class="nt">
++    Ici la fonction r&eacute;alise une action (afficher du texte) et ne retourne
++    rien, &agrave; part le type &laquo;&nbsp;unit&nbsp;&raquo;.
++  </div>
+ 
+ <pre>
+-CAMLprim value
+-send_an_int( value unit )
+-{
+-    int i;
+-    i = 6;
+-    return Val_int(i);
+-}
++# print_newline <span class="Const">()</span> <span class="Stat">;;</span>
++
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+-  <div>
+-    The conversion macro <code>Val_int()</code> is similar to the macros seen
+-    before, it converts a C integer into an OCaml integer value.
++  <div class="nt">
++    La fonction <code>print_newline</code> affiche simplement une nouvelle ligne,
++    et ne prend pas réellement de param&egrave;tre, donc on lui passe simplement le type <code>unit</code>
++    pour l'ex&eacute;cuter.
+   </div>
+ 
+-  <div>
+-    For cases where C code uses long integers, instead of <code>Int_val()</code>
+-    just use <code>Long_val()</code>.
+-  </div>
+-  <div>
+-    In the same way you can convert an OCaml boolean to a C integer with
+-    <code>Bool_val()</code>, and a C integer to an OCaml boolean with
+-    <code>Val_bool()</code>. For convenience there are also 
+-    macros <code>Val_true</code> and <code>Val_false</code>.
+-  </div>
+ 
+ 
+-  <h3><span>Allocated Types</span></h3>
++  <!-- ======================================================== -->
++  <hr />
++
++  <h4 id="def_transtypage">Transtypage</h4>
+ 
+   <div>
+-    It goes a bit different for floats and strings than ints, since these types
+-    have to be allocated for OCaml, and one thing important to know in OCaml is
+-    that when an allocation is done (a new value created), a garbage collection may
+-    be done. If the allocation is given at the end point in the C <code>return</code>
+-    statement, all is fine. But notice that in other cases which will be seen below,
+-    additional statements have to be used.
++    Certains langages de programmation convertissent les variables implicitement,
++    en OCaml, il faut le faire explicitement.<br />
++    <small>
++      (Vous rencontrerez parfois aussi le terme "coercition" &agrave; la place de transtypage.)
++    </small>
+   </div>
+ 
++  <div class="nb">
++    Pour obtenir un nombre &agrave; virgule &agrave; partir d'un entier&nbsp;:
++  </div>
+ <pre>
+-external get_a_float: unit -&gt; float = "send_a_float"
+-external get_a_string: unit -&gt; string = "send_a_string"
++# float_of_int <span class="Const">16</span> <span class="Stat">;;</span>
++- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">16.</span>
+ </pre>
+-
++  <div class="nbnt">
++    Et inversement&nbsp;:
++  </div>
+ <pre>
+-#include &lt;caml/alloc.h&gt;
+-
+-CAMLprim value
+-send_a_float( value unit )
+-{
+-    double d;
+-    d = 2.6;
+-    return caml_copy_double(d);
+-}
+-
+-CAMLprim value
+-send_a_string( value unit )
+-{
+-    char *s = "the walking camel";
+-    return caml_copy_string(s);
+-}
++# int_of_float <span class="Const">12.0</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">12</span>
+ </pre>
+ 
+-  <div>
+-    In more complex functions where input values are still used after a new OCaml
+-    value is allocated, there is a risk that the input value cannot be used because
+-    it has been garbage collected when the new OCaml value is allocated.
+-    In such cases you have to use the macros <code>CAMLparam<em>N</em>()</code>
+-    (where <em>N</em> is the number of parameters) at the beginning of the function
+-    and at the end instead of <code>return</code> use <code>CAMLreturn()</code>.
+-    And for local allocated values, use the declaration
+-    <code>CAMLlocal<em>N</em>()</code>. For example you could write the previous
+-    functions "send_a_float" and "send_a_string" in this way:
++  <div class="nt">
++    Le fait de ne pas convertir implicitement les entiers et les flottants permet d'&eacute;viter
++    certaines erreurs de programmation.
+   </div>
+ 
+-<pre>
+-CAMLprim value
+-send_a_float( value unit )
+-{
+-    CAMLparam1(unit);
+-    CAMLlocal1(ml_f);
+-    double d;
+-    d = 2.6;
+-    ml_f = caml_copy_double(d);
+-    CAMLreturn(ml_f);
+-}
+ 
+-CAMLprim value
+-send_a_string( value unit )
+-{
+-    CAMLparam1(unit);
+-    CAMLlocal1(ml_s);
+-    char *s = "the walking camel";
+-    ml_s = caml_copy_string(s);
+-    CAMLreturn(ml_s);
+-}
+-</pre>
+-  <div>
+-    When you are not sure if you need to use these macro or not, it's better to use
+-    these to stay in peace with the garbage collector, since using these macros won't
+-    cause problems, even if they are not needed. That's why you will see below
+-    cases where they are used while not strictly needed. Moreover, a lot of OCaml
+-    users recommend always using these to avoid the risk of forgetting to use them
+-    when they are needed.
++  <div class="nb">
++    Pour obtenir le code ascii (encodage de caract&egrave;res) d'un caract&egrave;re&nbsp;:
+   </div>
+-
+-  <div>
+-    Also when using this set of macros, add this header where they are defined:
++<pre>
++# int_of_char <span class="Const">'A'</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">65</span>
++</pre>
++  <div class="nbnt">
++    Et inversement&nbsp;:
+   </div>
+ <pre>
+-#include &lt;caml/memory.h&gt;
++# char_of_int <span class="Const">97</span> <span class="Stat">;;</span>
++- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'a'</span>
+ </pre>
+ 
+ 
+-
+-  <!-- ========================================================= -->
+-
+-  <hr />
+-
+-  <h2><span>Constructed Types</span></h2>
+-
+-  <div>
+-    Now let's see how to inspect and construct more complex structures like tuples,
+-    arrays, lists and records.
++  <div class="nb">
++    Idem pour r&eacute;aliser des op&eacute;rations arithm&eacute;tiques, les nombres doivent
++    &ecirc;tre de m&ecirc;me type&nbsp;:
+   </div>
++<pre>
++# <span class="Const">4</span> <span class="Stat">+</span> <span class="Const">6</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">10</span>
++</pre>
+ 
+ 
++  <div class="nb">
++    Les op&eacute;rateurs arithm&eacute;tiques agissant sur les flottants doivent &ecirc;tre
++    suffix&eacute;s par un point&nbsp;:
++  </div>
++<pre>
++# <span class="Const">2.4</span> <span class="Stat">*.</span> <span class="Const">1.2</span> <span class="Stat">;;</span>
++- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">2.88</span>
++</pre>
+ 
+-  <!-- ========================================================= -->
+-
+-  <h3 id="ref_tuple_access"><span>Accessing Tuples</span></h3>
+ 
+-  <div>
+-    To access the content of an OCaml tuple, the <code>Field()</code> macro is 
+-    provided to access each piece of the tuple. Then each field is as usual of 
+-    type value which needs to be converted to native C types.
++  <div class="nb">
++    Combinaison des deux types avec transtypage&nbsp;:
+   </div>
+ <pre>
+-external inspect_tuple: int * float * string -&gt; unit = "inspect_tuple"
++# <span class="Stat">(</span>float<span class="Stat">)</span> <span class="Const">9</span> <span class="Stat">/.</span> <span class="Const">1.2</span> <span class="Stat">;;</span>
++- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">7.5</span>
+ </pre>
++  <div class="nt">
++    Pour r&eacute;aliser un transtypage il ne s'agit pas d'indiquer le type
++    souhait&eacute; avant l'expression entre parenth&egrave;se comme pourrait
++    le sugg&eacute;rer cet exemple,
++    il faut utiliser une fonction qui r&eacute;alise la conversion de type.
++    En l'occurrence ici <code>float</code> n'est qu'un alias de la fonction
++    <code>float_of_int</code> vue plus haut, et placer cette fonction dans un
++    tuple (les tuples seront vus plus bas) n'influe en rien sur son fonctionnement.
++  </div>
+ 
+-<pre>
+-CAMLprim value
+-inspect_tuple( value ml_tuple )
+-{
+-    CAMLparam1( ml_tuple );
+-    CAMLlocal3( vi, vf, vs );
+ 
+-    vi = Field(ml_tuple, 0);
+-    vf = Field(ml_tuple, 1);
+-    vs = Field(ml_tuple, 2);
+ 
+-    printf("%d\n", Int_val(vi));
+-    printf("%f\n", Double_val(vf));
+-    printf("%s\n", String_val(vs));
++  <!-- ======================================================== -->
++  <hr />
+ 
+-    CAMLreturn( Val_unit );
+-}
+-</pre>
++  <h2 id="def_val">D&eacute;finir une valeur</h2>
+ 
+-  <div>
+-    You can check the result is as expected from the top-level:
++  <div class="nb">
++    Pour d&eacute;finir un &eacute;l&eacute;ment nomm&eacute;
++    (une valeur ou une fonction) on utilise
++    le constructeur <code>'<span class="Stat">let</span>'</code>
++    suivit d'un identifiant&nbsp;:
+   </div>
+ <pre>
+-# inspect_tuple (3, 2.4, "functional") ;;
+-3
+-2.400000
+-functional
+-- : unit = ()
++# <span class="Stat">let</span> my_item <span class="Stat">=</span> <span class="Const">128</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> my_item : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">128</span>
+ </pre>
+ 
+   <div>
+-    Or the C part may have been written in a more concise way to get the same result:
+-  </div>
+-<pre>
+-CAMLprim value
+-inspect_tuple( value ml_tuple )
+-{
+-    printf("%d\n", Int_val(Field(ml_tuple,0)));
+-    printf("%f\n", Double_val(Field(ml_tuple,1)));
+-    printf("%s\n", String_val(Field(ml_tuple,2)));
+-    return Val_unit;
+-}
+-</pre>
+-  <div>
+-    (Since there are no allocation here.)
++    Ci-dessus l'&eacute;l&eacute;ment est de type entier int, il pourra donc &ecirc;tre
++    utilis&eacute; partout o&ugrave; un entier <code>int</code> est attendu.
++    OCaml, en r&eacute;ponse &agrave; l'entr&eacute;e, indique ici en plus le nom de l'&eacute;l&eacute;ment.
++    (Ce nom ne peut pas commencer par une majuscule ou un chiffre.)
+   </div>
+ 
+-  <div>
+-    Accessing fields of a record is exactly the same than for a tuple:
++  <div class="nb">
++    V&eacute;rifiez que le lien a bien &eacute;t&eacute; d&eacute;fini&nbsp;:
+   </div>
+ <pre>
+-type rec_t = { a:int; b:float; c:string }
+-external inspect_record: rec_t -&gt; unit = "inspect_record"
++# my_item <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">128</span>
+ </pre>
+ 
++
++  <div class="nb">
++    L'expression d&eacute;finie ci-dessus n'est pas &agrave; proprement parler
++    ce que l'on appelle une variable dans d'autres langages (on pourrait les
++    voir comme des variables constantes), car sa valeur ne peut &ecirc;tre
++    "r&eacute;ellement modifi&eacute;e" (en tout cas pour les types fonctionnels d'OCaml),
++    m&ecirc;me s'il est possible d'en cr&eacute;er une nouvelle portant le m&ecirc;me nom
++    (et ce m&ecirc;me &agrave; partir de la pr&eacute;c&eacute;dante)&nbsp;:
++  </div>
+ <pre>
+-CAMLprim value
+-inspect_record( value ml_record )
+-{
+-    printf("%d\n", Int_val(Field(ml_record, 0)));
+-    printf("%g\n", Double_val(Field(ml_record, 1)));
+-    printf("%s\n", String_val(Field(ml_record, 2)));
+-    return Val_unit;
+-}
++# <span class="Stat">let</span> my_item <span class="Stat">=</span> my_item <span class="Stat">*</span> <span class="Const">2</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> my_item : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">256</span>
+ </pre>
+-  <div>
+-    The index number of the fields are ordered as the fields appear in the OCaml
+-    declaration of the record type.
++  <div class="nt">
++    Si vous faites le choix de la programmation fonctionnelle, vous pr&eacute;f&eacute;rerez
++    &eacute;viter ce genre de chose car ce genre de programmation ressemble fort
++    &agrave; du style imp&eacute;ratif.
++    Si lors d'une modification ult&eacute;rieure du programme vous supprimez la
++    "red&eacute;finition", ce sera donc la pr&eacute;c&eacute;dante qui sera
++    utilis&eacute;e, et cela peut potentiellement &ecirc;tre inappropri&eacute;.
++    <br />
++    Dans le cas ci-dessus certains programmeurs fonctionels recommandent d'utiliser
++    un nouveau nom plut&ocirc;t que de cr&eacute;er un homonyme
++    (qui aura d'ailleur peut-&ecirc;tre un type diff&eacute;rent).
++    Prendre un nom diff&eacute;rent ne sera pas plus gourmand (ni en temps, ni en
++    espace).
+   </div>
+ 
+-<pre>
+-# inspect_record {a=26; b=4.3; c="camelids folks" } ;;
+-26
+-4.3
+-camelids folks
+-- : unit = ()
+-</pre>
++
+   <div>
+-    There is though a particular case when all the fields of the record are of
+-    type float, in this case the record is seen from C as a float array, see below
+-    for this particular case.
++    Les variables modifiables transversalement seront vues ult&eacute;rieurement,
++    <!-- TODO -->
++    mais si vous faites le choix d'adopter un style fonctionel vous &eacute;viterez leur usage&nbsp;;
++    le fait que leur valeur soit accessible transversalement induit des effets
++    de bords, souvent &agrave; l'origine de bugs.
++    Il est pratiquement toujours possible d'utiliser une valeur nomm&eacute;e fonctionnelle
++    plut&ocirc;t qu'une variable imp&eacute;rative.
++    <br />
++    Apr&egrave;s pour l'&eacute;criture de scripts, et dans certains cas un style imp&eacute;ratif
++    local &agrave; une fonction permet parfois d'&eacute;crire du code plus simple &agrave;
++    lire et &agrave; &eacute;crire.
++    Il ne faut pas &ecirc;tre trop extr&eacute;miste non plus, la simplicit&eacute; du code
++    &eacute;tant souvent plus importante.
+   </div>
+ 
+ 
+ 
+-  <!-- ========================================================= -->
+-
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_array_access"><span>Accessing Arrays</span></h3>
+-
+ 
+   <div>
+-    Accessing fields of arrays is very similar:
++    OCaml fournit plusieurs structures permettant de regrouper des
++    &eacute;l&eacute;ments (comme les types primitifs vu en d&eacute;but du didacticiel)&nbsp;:
++    les tableaux (type 'array'), les listes (type 'list') et les tuples.
+   </div>
+-<pre>
+-external inspect_int_array: int array -&gt; unit = "inspect_int_array"
+-</pre>
+ 
+-<pre>
+-CAMLprim value
+-inspect_int_array( value ml_array )
+-{
+-    CAMLparam1( ml_array );
+-    int i, len;
+-    len = Wosize_val(ml_array);
+-    for (i=0; i &lt; len; i++)
+-    {
+-        printf("%d\n", Int_val(Field(ml_array, i)));
+-    }
+ 
+-    CAMLreturn( Val_unit );
+-}
+-</pre>
+-  <div>
+-    The only trick here is to get the number of elements in the array.
+-    And also if the array is a <code>float array</code> the macros to
+-    get the number of elements and to access the content are a bit different:
+-  </div>
+-
+-<pre>
+-external inspect_float_array: float array -&gt; unit = "inspect_float_array"
+-</pre>
++  <h2 id="def_tableaux">Les Tableaux</h2>
+ 
++  <div class="nb">
++    Les tableaux sont de dimension fixe, et ne doivent contenir que des
++    &eacute;l&eacute;ments du m&ecirc;me type&nbsp;:
++  </div>
+ <pre>
+-CAMLprim value
+-inspect_float_array( value ml_float_array )
+-{
+-    CAMLparam1( ml_float_array );
+-    int i, len;
+-    len = Wosize_val(ml_float_array) / Double_wosize;
+-    for (i=0; i &lt; len; i++)
+-    {
+-        printf("%g\n", Double_field(ml_float_array, i));
+-    }
++# <span class="Stat">[|</span> <span class="Const">'b'</span><span class="Stat">;</span> <span class="Const">'E'</span><span class="Stat">;</span> <span class="Const">'t'</span><span class="Stat">;</span> <span class="Const">'i'</span> <span class="Stat">|]</span> <span class="Stat">;;</span>
++- : <span class="Type">char</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">'b'</span><span class="Stat">;</span> <span class="Const">'E'</span><span class="Stat">;</span> <span class="Const">'t'</span><span class="Stat">;</span> <span class="Const">'i'</span><span class="Stat">|]</span>
+ 
+-    CAMLreturn( Val_unit );
+-}
++# <span class="Stat">let</span> my_array <span class="Stat">=</span> <span class="Stat">[|</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">;</span> <span class="Const">64</span> <span class="Stat">|]</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> my_array : <span class="Type">int</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">;</span> <span class="Const">64</span><span class="Stat">|]</span>
+ </pre>
+ 
+-  <div>
+-    If you test these two functions:
++
++  <div class="nb">
++    Les tableaux sont bien adapt&eacute;s pour pouvoir acc&eacute;der rapidement &agrave; un &eacute;l&eacute;ment
++    (n'importe lequel) &agrave; partir de son index dans le tableau&nbsp;:
+   </div>
+ <pre>
+-# inspect_int_array [| 2; 4; 3; 1; 9 |] ;;
+-2
+-4
+-3
+-1
+-9
+-- : unit = ()
+-
+-# inspect_float_array [| 2.4; 5.8; 6.9; 12.2; 32.8 |] ;;
+-2.4
+-5.8
+-6.9
+-12.2
+-32.8
+-- : unit = ()
++# my_array.<span class="Stat">(</span><span class="Const">2</span><span class="Stat">)</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">7</span>
+ </pre>
++  <div class="nt">
++    L'acc&egrave;s &agrave; n'importe lequel des &eacute;l&eacute;ments d'un tableau se fait en vitesse constante
++    (ce que l'on app&egrave;le <strong>0(1)</strong> prononcez "Oh un"),
++    ce qui signifie que &ccedil;a prend le m&ecirc;me temps pour acc&eacute;der à n'importe lequel des &eacute;l&eacute;ments.
++    Ce qui n'est pas le cas avec les listes, pour lesquelles il faut d&eacute;piler
++    tous les &eacute;l&eacute;ments pr&eacute;sents avant celui que l'on souhaite retrouver.
++    Avec les listes, il est donc plus rapide d'acc&eacute;der &agrave; un &eacute;l&eacute;ment au d&eacute;but
++    de la liste, qu'&agrave; la fin.
++  </div>
+ 
+ 
+ 
+-  <!-- ========================================================= -->
+-
+-  <hr />
+-
+-  <h3 id="ref_list_access"><span>Accessing Lists</span></h3>
++  <h2 id="def_list">Les Listes</h2>
+ 
+-  <div>
+-    Now here is how you can access the content of an OCaml list:
++  <div class="nb">
++    Les listes ne doivent &eacute;galement contenir que des &eacute;l&eacute;ments
++    du m&ecirc;me type&nbsp;:
+   </div>
+ <pre>
+-external inspect_list: string list -&gt; unit = "inspect_list"
++# <span class="Stat">[</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">45</span><span class="Stat">;</span> <span class="Const">24</span><span class="Stat">;</span> <span class="Const">17</span><span class="Stat">;</span> <span class="Const">0</span><span class="Stat">;</span> <span class="Const">9</span> <span class="Stat">]</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">45</span><span class="Stat">;</span> <span class="Const">24</span><span class="Stat">;</span> <span class="Const">17</span><span class="Stat">;</span> <span class="Const">0</span><span class="Stat">;</span> <span class="Const">9</span><span class="Stat">]</span>
+ </pre>
+ 
+-<pre>
+-CAMLprim value
+-inspect_list( value ml_list )
+-{
+-    CAMLparam1( ml_list );
+-    CAMLlocal1( head );
+ 
+-    while ( ml_list != Val_emptylist )
+-    {
+-        head = Field(ml_list, 0);  /* accessing the head */
+-        printf("%s\n", String_val(head));
+-        ml_list = Field(ml_list, 1);  /* point to the tail for next loop */
+-    }
++  <div class="nb">
++    On r&eacute;alise l'empilement et le d&eacute;pilement des
++    &eacute;l&eacute;ments uniquement au sommet de la pile.
++    Les listes ne sont donc pas de taille fixe comme les tableaux.
++    (elle sont de taille fixe au sens de la programmation fonctionnelle,
++    mais une nouvelle liste peut &ecirc;tre cr&eacute;&eacute;e facillement avec une taille
++    diff&eacute;rente, et les &eacute;l&eacute;ments communs seront partag&eacute;s au niveau de la
++    m&eacute;moire, et non dupliqu&eacute;s)
++  </div>
++<pre>
++# <span class="Stat">let</span> my_list <span class="Stat">=</span> <span class="Stat">[</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span> <span class="Stat">]</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> my_list : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">]</span>
+ 
+-    CAMLreturn( Val_unit );
+-}
++# <span class="Const">8</span> <span class="Stat">::</span> my_list <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">8</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">]</span>
+ </pre>
++  <div class="nt">
++    Elle sont bien adapt&eacute;es pour r&eacute;aliser des piles
++    d'&eacute;l&eacute;ments, dans lesquelles on va venir empiler et
++    d&eacute;piler des &eacute;l&eacute;ments au sommet de la pile.
++    (Pensez pour cela &agrave; une pile d'assiette, au sommet de laquelle on
++    vient ajouter les assiettes lav&eacute;es, puis au sommet de laquelle on
++    va venir prendre des assiettes propres lorsqu'on en a besoin.)
++  </div>
+ 
+-  <div>
+-    Test it from the top-level:
++
++  <div class="nb">
++    L'empilement et le d&eacute;pilement d'&eacute;l&eacute;ments peuvent
++    &ecirc;tre r&eacute;alis&eacute;s respectivement &agrave; partir et
++    jusqu'&agrave; la liste vide&nbsp;, laquelle est d&eacute;finie comme suit:
+   </div>
+ <pre>
+-# inspect_list ["hello"; "you"; "world"; "camelids"] ;;
+-hello
+-you
+-world
+-camelids
+-- : unit = ()
++# <span class="Const">[]</span> <span class="Stat">;;</span>
++- : 'a <span class="Type">list</span> <span class="Stat">=</span> <span class="Const">[]</span>
+ </pre>
+-  <div>
+-    As you can see lists are constructed as pair of items, the first item in the
+-    pair is the head, and the second is the tail, which can be another list or
+-    the empty list which is written as <code>[]</code> on the OCaml side, and
+-    <code>Val_emptylist</code> on the C side.
++  <div class="nt">
++    (Le &laquo;&nbsp;'a&nbsp;&raquo; indique alors que le type est ind&eacute;fini.)
+   </div>
+ 
+-  <div>
+-    As an illustration of this you can test from the top-level typing these commands:
++  <div class="nb">
++    L'opérateur d'empilement est <code>'<span class="Stat">::</span>'</code>&nbsp;:
+   </div>
+ <pre>
+-# external trans: (int * (int * (int * (int * int)))) -&gt; int list = "%identity" ;;
+-external trans : int * (int * (int * (int * int))) -&gt; int list = "%identity"
++# <span class="Const">3</span> <span class="Stat">::</span> <span class="Const">[]</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">3</span><span class="Stat">]</span>
+ 
+-# trans (1, (2, (3, (4, 0)))) ;;
+-- : int list = [1; 2; 3; 4]
++# <span class="Const">3</span> <span class="Stat">::</span> <span class="Const">2</span> <span class="Stat">::</span> <span class="Const">1</span> <span class="Stat">::</span> <span class="Const">[]</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">3</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">1</span><span class="Stat">]</span>
+ </pre>
++
+   <div>
+-    Here "%identity" is a built-in OCaml function which just allows to convert
+-    a type to another, keeping its internal representation identical.
+-  </div>
+-  <div>
+-    And you can also notice here that the last integer given is 0, since
+-    as you can see reading the <code>&lt;caml/mlvalues.h&gt;</code> header that
+-    <code>Val_emptylist</code> is defined as <code>Val_int(0)</code>.
++    Les listes sont bien adapt&eacute;es lorsque ses &eacute;l&eacute;ments
++    doivent &ecirc;tre parcourus de mani&egrave;re s&eacute;quentielle,
++    et ordonn&eacute;e.
+   </div>
+ 
+ 
+ 
+-  <!-- ========================================================= -->
++  <h2 id="def_tuple">Les Tuples</h2>
+ 
+-  <hr />
+-
+-  <h3 id="ref_create_tuple"><span>Creating Tuples and Arrays</span></h3>
+-
+-  <div>
+-    Now let's see how to construct a tuple on the C side and returning it
+-    to OCaml:
++  <div class="nb">
++    Les tuples permettent de regrouper des &eacute;l&eacute;ments qui peuvent
++    &ecirc;tre de type diff&eacute;rent. Ils regroupent g&eacute;n&eacute;ralement
++    un petit nombre d'&eacute;l&eacute;ments.
++    Il sont utilis&eacute;s par exemple lorsqu'une fonction doit retourner
++    plusieurs &eacute;l&eacute;ments (qui seront alors regroup&eacute;s dans un
++    tuple).
+   </div>
+ <pre>
+-external create_tuple: 'a -&gt; 'b -&gt; 'c -&gt; 'a * 'b * 'c = "create_tuple"
+-</pre>
++# <span class="Stat">(</span><span class="Const">3</span>, <span class="Const">'F'</span><span class="Stat">)</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">*</span> <span class="Type">char</span> <span class="Stat">=</span> <span class="Stat">(</span><span class="Const">3</span>, <span class="Const">'F'</span><span class="Stat">)</span>
+ 
+-<pre>
+-CAMLprim value
+-create_tuple( value a, value b, value c )
+-{
+-    CAMLparam3( a, b, c );
+-    CAMLlocal1( abc );
++# <span class="Stat">let</span> a <span class="Stat">=</span> <span class="Const">3</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> a : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">3</span>
++# <span class="Stat">let</span> b <span class="Stat">=</span> <span class="Const">'F'</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> b : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'F'</span>
+ 
+-    abc = caml_alloc(3, 0);
++# <span class="Stat">let</span> <span class="Stat">(</span>a, b<span class="Stat">)</span> <span class="Stat">=</span> <span class="Stat">(</span>b, a<span class="Stat">)</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> a : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'F'</span>
++<span class="Stat">val</span> b : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">3</span>
+ 
+-    Store_field( abc, 0, a );
+-    Store_field( abc, 1, b );
+-    Store_field( abc, 2, c );
+-
+-    CAMLreturn( abc );
+-}
++# a <span class="Stat">;;</span>
++- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'F'</span>
++# b <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">3</span>
+ </pre>
+ 
++  <div class="nb">
++    Un tuple peut contenir n'importe quoi, un nombre, une cha&icirc;ne de caract&egrave;re,
++    une liste, un tableau ou m&ecirc;me une fonction&nbsp;:
++  </div>
+ <pre>
+-# create_tuple 38 'G' "www.ifrc.org" ;;
+-- : int * char * string = (38, 'G', "www.ifrc.org")
++# <span class="Stat">(</span><span class="Const">12.5</span>, <span class="Const">&quot;www.ifrc.org&quot;</span>, float_of_int<span class="Stat">)</span> <span class="Stat">;;</span>
++- : <span class="Type">float</span> <span class="Stat">*</span> <span class="Type">string</span> <span class="Stat">*</span> <span class="Stat">(</span><span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">float</span><span class="Stat">)</span> <span class="Stat">=</span> <span class="Stat">(</span><span class="Const">12.5</span>, <span class="Const">&quot;www.ifrc.org&quot;</span>, <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span><span class="Stat">)</span>
+ </pre>
+-
+-  <div>
+-    The first parameter of <code>caml_alloc()</code> is the number of fields,
+-    and the second one indicates the tag of the value, here it is 0 because
+-    for ordinary ocaml values like tuples there is no tags needed.
++  <div class="nt">
++    Et comme nous l'avons dit, en OCaml tout a un type, m&ecirc;me les fonctions
++    ont leur type. Nous allons voir cela plus bas.
+   </div>
+ 
+   <div>
+-    And it works the same for records, as we have seen they have the same
+-    internal representation as tuples, except when the record contains only floats.
++    Le fait que les fonctions puissent être plac&eacute;e dans des structures
++    et pass&eacute;es en param&egrave;tre de fonction, on dit que les fonctions sont
++    des &eacute;l&eacute;ments de premi&egrave;re classe
++    (<a href="https://www.ecosia.org/search?q=first+class+citizen+functions"
++      >"first class citizen functions"</a> en anglais).
+   </div>
+ 
+-  <div>
+-    This also works for arrays except that you have to make sure that all
+-    the elements of the array have the same type. All arrays can be created
+-    this way except
+-    <code>float array</code>s that have a different internal representation.
+-  </div>
+ 
+-  <div>
+-    In the same manner than the list, you can verify that records and tuples have the
+-    same internal representation with:
+-  </div>
+-<pre>
+-# type rec_b = { i:int; c:char; s:string } ;;
+-type rec_b = { i : int; c : char; s : string; }
++  <!-- ======================================================== -->
++  <hr />
+ 
+-# external trans: rec_b -&gt; int * char * string = "%identity" ;;
+-external trans : rec_b -&gt; int * char * string = "%identity"
+ 
+-# trans { i=38; c='G'; s="www.ifrc.org" } ;;
+-- : int * char * string = (38, 'G', "www.ifrc.org")
+-</pre>
++  <h2 id="def_func">Les Fonctions</h2>
+ 
++  <div class="nb">
++    L'environnement OCaml fournit par d&eacute;faut un ensemble de fonctions
++    contenues dans sa biblioth&egrave;que standard, compos&eacute;e de plusieurs "modules".
++    Le nom des modules commence toujours par une majuscule, par exemple
++    le module <strong>String</strong> qui fournit des fonctions pour manipuler les
++    cha&icirc;nes de caract&egrave;res. Une des fonctions fournies par le module
++    <strong>String</strong>
++    est la fonction '<em>length</em>'. Pour pouvoir l'utiliser il faut soit faire
++    pr&eacute;c&eacute;der le nom de la fonction par le nom du module, soit ouvrir le
++    module 'String' au pr&eacute;alable. Voici les deux m&eacute;thodes&nbsp;:
++  </div>
+ <pre>
+-# external create_rec_b: int -&gt; char -&gt; string -&gt; rec_b = "create_tuple" ;;
+-external create_rec_b : int -&gt; char -&gt; string -&gt; rec_b = "create_tuple"
++# <span class="Mod">String</span>.length <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5</span>
+ 
+-# create_rec_b 38 'G' "www.ifrc.org" ;;
+-- : rec_b = {i = 38; c = 'G'; s = "www.ifrc.org"}
++# <span class="Stat">open</span> <span class="Mod">String</span> <span class="Stat">;;</span>
++# length <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5</span>
+ </pre>
++  <div class="nt">
++    Une fois ouvert, les fonctions d'un module sont accessibles dans
++    toute la suite de la session ou du fichier de code source.
++  </div>
+ 
+ 
+-
+-  <!-- ========================================================= -->
+-
+-  <hr />
+-
+-  <h3 id="ref_create_list"><span>Creating Lists</span></h3>
+-
+-  <div>
+-    At this point you should be able to find how to build an OCaml list form C.
+-    Here is an example:
++  <div class="nb">
++    OCaml est un langage &agrave; expression. Chaque &eacute;l&eacute;ment
++    est une expression, et chaque expression a un type.
++    Ceci s'exp&eacute;rimente ainsi en tapant juste le nom d'une fonction,
++    le type de la fonction est alors indiqu&eacute;&nbsp;:
+   </div>
+-
+ <pre>
+-external string_explode: string -&gt; char list = "create_list"
++# <span class="Mod">String</span>.length <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ </pre>
++  <div>
++    Le type (ou la signature) d'une fonction est en quelque sorte ce que l'on appelle le
++    prototype d'une fonction dans d'autres langages, mais ce n'est pas
++    totalement &eacute;quivalent en raison des possibilit&eacute;s d'application
++    partielle d'OCaml qui seront vues ult&eacute;rieurement.<br />
++    Ici on voit que la fonction '<code>length</code>' prend un argument
++    de type '<code>string</code>' (cha&icirc;ne de caract&egrave;re) et qu'elle renvoie
++    un &eacute;l&eacute;ment de type '<code>int</code>' (entier).
++  </div>
++
+ 
++  <div class="nb">
++    Avant d'utiliser une fonction, pour savoir quelle sorte de param&egrave;tre lui
++    passer, vous pouvez v&eacute;rifier sa signature dans l'interpréteur interactif
++    ocaml&nbsp;:
++  </div>
+ <pre>
+-CAMLprim value create_list( value ml_str )
+-{
+-    CAMLparam1( ml_str );
+-    CAMLlocal2( cli, cons );
++[guest@localhost &tilde;]$ ocaml
++        OCaml version 4.11.1
++ 
++# float_of_int <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">float</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
++ 
++# int_of_char <span class="Stat">;;</span>
++- : <span class="Type">char</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
++ 
++# print_string <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
++</pre>
+ 
+-    const char *str = String_val(ml_str);
+-    int len = caml_string_length(ml_str);
+-    int i;
+ 
+-    cli = Val_emptylist;
++  <div>
++    Ces fonctions font partie du module
++    <a href="https://ocaml.org/releases/4.11/htmlman/libref/Stdlib.html"
++    >'Stdlib'</a>
++    qui est le module ouvert par d&eacute;faut (il n'y a pas besoin de l'ouvrir pour
++    en utiliser ses fonctions).
++    <br />
++    Si vous souhaitez utiliser une ancienne version d'OCaml le module 'Stdlib'
++    se nommait 'Pervasives' avant.
++    <br />
++    Nous avons &eacute;galement &eacute;voqu&eacute; le
++    <a href="https://ocaml.org/releases/4.11/htmlman/libref/String.html"
++    >module String</a> juste avant,
++    <a href="https://ocaml.org/releases/4.11/htmlman/libref/index_modules.html"
++    >chaque module a une page de documentation</a> dans le
++    <a href="https://ocaml.org/releases/latest/manual.html">manuel d'OCaml</a>.<br />
++    Cependant pour utiliser certaines de ces fonctions, vous aurez
++    probablement besoin d'en conna&icirc;tre un petit peu plus sur OCaml avant,
++    donc lisez la suite.
++  </div>
+ 
+-    for (i = len - 1; i &gt;= 0; i--)
+-    {
+-        cons = caml_alloc(2, 0);
+ 
+-        Store_field( cons, 0, Val_int(str[i]) );  // head
+-        Store_field( cons, 1, cli );              // tail
+ 
+-        cli = cons;
+-    }
++  <!-- ======================================================== -->
++  <hr />
+ 
+-    CAMLreturn( cli );
+-}
+-</pre>
+ 
++  <div class="nb">
++    Pour d&eacute;finir une fonction nomm&eacute;e on utilise le constructeur 'let',
++    comme pour d&eacute;finir une valeur&nbsp;:
++  </div>
+ <pre>
+-# string_explode "OCaml" ;;
+-- : char list = ['O'; 'C'; 'a'; 'm'; 'l']
+-</pre>
+-
++# <span class="Stat">let</span> step a <span class="Stat">=</span> a + <span class="Const">2</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> step : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
++# step <span class="Const">6</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">8</span>
++</pre>
++  <div class="nt">
++    OCaml &eacute;tant un langage &agrave; expression il n'est point besoin
++    d'utiliser une instruction 'return' comme dans d'autres langages, on donne
++    directement l'expression qui doit &ecirc;tre renvoy&eacute;e.
++  </div>
+ 
+-  <!-- ========================================================= -->
+ 
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_create_float_arr"><span>Creating Floats arrays</span></h3>
+ 
+   <div>
+-    And as the floats arrays are particular, they are a bit different to create
+-    from C, notice both the length trick and the tag when allocating:<br />
+-    <code>float_array = caml_alloc(length * Double_wosize, Double_array_tag);</code>
+-    <br />
+-    And to store elements use <code>Store_double_field()</code> instead of
+-    <code>Store_field()</code>, and there's no need to use the
+-    <code>caml_copy_double</code>
+-    in it.
++    Dans un programme ou un script, nous avons souvent besoin de pouvoir
++    ex&eacute;cuter certaines parties de codes plut&ocirc;t que d'autres.
++    OCaml offre plusieurs structures de contr&ocirc;le pour cela.
+   </div>
+ 
+-  <hr />
+-
+-
+-  <h3 id="ref_enums"><span>Enums / Variants</span></h3>
+-
+   <div>
+-    For wrapping C enums, or for wrapping params defined as constant with
+-    <code>#define</code> the method is the same.
+-    Both can be wrapped on OCaml enumerated variants with constants constructors
+-    without parameters. From the C site the constructors is represented as integers
+-    ordered from 0 to (N - 1) (where N is the number of constructors in the variant
+-    type).
+-    So basically you can just use a <code>switch</code> or an array containing all
+-    these values make match the C value.
+-    For instance:
++    (Si vous connaissez d&eacute;j&agrave; des langages de programmation ou de
++    script, vous serez peut-&ecirc;tre un peu d&eacute;pays&eacute; par celles
++    d'OCaml.)
+   </div>
+ 
+-<pre>
+-type moving =
+-  | WALKING
+-  | RUNNING
+-  | SWIMMING
+-  | FLYING
+ 
+-external send_enum: moving -&gt; unit = "wrapping_enum_ml2c"
+-</pre>
++  <h2 def="def_if">Condition if</h2>
+ 
++  <div class="nb">
++    La fa&ccedil;on la plus simple d'utiliser la structure 'if' ("si" en fran&ccedil;ais),
++    est de lui fournir une comparaison de ce genre&nbsp;:
++  </div>
+ <pre>
+-typedef enum _moving {
+-    WALKING,
+-    RUNNING,
+-    SWIMMING,
+-    FLYING
+-} moving;
+-
+-CAMLprim value
+-wrapping_enum_ml2c( value v )
+-{
+-    moving param;
+-    switch (Int_val(v)) {
+-        case 0: param = WALKING; break;
+-        case 1: param = RUNNING; break;
+-        case 2: param = SWIMMING; break;
+-        case 3: param = FLYING; break;
+-    }
+-    switch (param) {
+-        case WALKING:  puts("Walking"); break;
+-        case RUNNING:  puts("Running"); break;
+-        case SWIMMING: puts("Swimming"); break;
+-        case FLYING:   puts("Flying"); break;
+-    }
+-    return Val_unit;
+-}
++# <span class="Const">2</span> <span class="Stat">&gt;</span> <span class="Const">3</span> <span class="Stat">;;</span>
++- : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">false</span>
+ </pre>
+-
+-  <div>
+-    Here it is very important to make match the good number in the switch
+-    according to the place in the enumeration in the OCaml variant.
++  <div class="nt">
++    ici 2 n'est pas sup&eacute;rieur &agrave; 3 donc le bool&eacute;en 'false'
++    est retourn&eacute;.
+   </div>
+ 
+   <div>
+-    To send back an constant variant from C to OCaml, just return
+-    <code>Val_int()</code>
+-    with its corresponding index.
++    (Pour l'&eacute;galit&eacute; utilisez de pr&eacute;f&eacute;rence
++    &laquo;&nbsp;=&nbsp;&raquo; &agrave; &laquo;&nbsp;==&nbsp;&raquo; sauf si vous
++    &ecirc;tes s&ucirc;r que vous recherchez strictement l'&eacute;galit&eacute;
++    physique de la zone de RAM point&eacute;e.)
+   </div>
+ 
+-  <div>
+-    If there are a lots of possible values in the enumeration (or possible
+-    constants), you can also use an array instead of a switch:
++  <div class="nb">
++    La structure de contr&ocirc;le 'if' doit obligatoirement utiliser le type
++    bool&eacute;en (bool)&nbsp;:
+   </div>
+-
+ <pre>
+-static const moving table_moving[] = {
+-    WALKING,
+-    RUNNING,
+-    SWIMMING,
+-    FLYING
+-};
+-
+-CAMLprim value
+-wrapping_enum_ml2c( value v )
+-{
+-    moving param;
+-    param = table_moving[Long_val(v)];
+-
+-    switch (param) {
+-        case WALKING:  puts("Walking"); break;
+-        case RUNNING:  puts("Running"); break;
+-        case SWIMMING: puts("Swimming"); break;
+-        case FLYING:   puts("Flying"); break;
+-    }
+-    return Val_unit;
+-}
++# <span class="Stat">if</span> <span class="Const">2</span> <span class="Stat">&gt;</span> <span class="Const">3</span> <span class="Stat">then</span> <span class="Const">&quot;first case&quot;</span> <span class="Stat">else</span> <span class="Const">&quot;second case&quot;</span> <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;second case&quot;</span>
+ </pre>
+-
+-  <div>
+-    Here you need to be sure not to try to access to an index in the association
+-    table after the last one. Which could occur if you add an item on the OCaml
+-    side, and forget to add it also in the array on the C side.<br />
+-    Something you could do is checking if the index requested is not greater
+-    than the last one, and if it is raising an exception.
++  <div class="nbnt">
++    On peut d&eacute;velopper l'expression pr&eacute;c&eacute;dente&nbsp;:
+   </div>
++<pre>
++# <span class="Stat">let</span> condition <span class="Stat">=</span> <span class="Stat">(</span><span class="Const">2</span> <span class="Stat">&gt;</span> <span class="Const">3</span><span class="Stat">)</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> condition : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">false</span>
++
++# <span class="Stat">if</span> condition
++  <span class="Stat">then</span> <span class="Const">&quot;la condition est vraie&quot;</span>
++  <span class="Stat">else</span> <span class="Const">&quot;la condition est fausse&quot;</span>
++  <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;la condition est fausse&quot;</span>
++</pre>
+ 
+ 
++  <div class="nb">
++    Comme les fonctions qui n'utilisent pas d'instruction return,
++    cette structure de contr&ocirc;le renvoie directement une expression,
++    qui peut &ecirc;tre utilis&eacute;e par exemple pour d&eacute;finir
++    une valeur nomm&eacute;e&nbsp;:
++  </div>
++<pre>
++# <span class="Stat">let</span> lang <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> lang : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+ 
+-  <!-- ========================================================= -->
++# <span class="Stat">let</span> my_item <span class="Stat">=</span>
++    <span class="Stat">if</span> lang.<span class="Stat">[</span><span class="Const">0</span><span class="Stat">]</span> <span class="Stat">=</span> <span class="Const">'O'</span>
++    <span class="Stat">then</span> <span class="Const">&quot;Objective&quot;</span>
++    <span class="Stat">else</span> <span class="Const">&quot;Unknown&quot;</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> my_item : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;Objective&quot;</span>
++</pre>
+ 
+-  <hr />
+ 
+-  <h3 id="ref_bitfield"><span>Convert C bit fields</span></h3>
+ 
+-  <div>
+-    Imagine you have a C bit field defined as below in your header file:
++  <div class="nb">
++    Encha&icirc;nement de structures if ("for&ecirc;ts d'else if")&nbsp;:
+   </div>
+ <pre>
+-#define ShiftMask      (1&lt;&lt;0)
+-#define LockMask       (1&lt;&lt;1)
+-#define ControlMask    (1&lt;&lt;2)
+-#define Mod1Mask       (1&lt;&lt;3)
++# <span class="Stat">let</span> comp a <span class="Stat">=</span>
++    <span class="Stat">if</span> a <span class="Stat">=</span> <span class="Const">4</span>
++    <span class="Stat">then</span> <span class="Const">&quot;equal&quot;</span>
++    <span class="Stat">else</span> <span class="Stat">if</span> a <span class="Stat">&gt;</span> <span class="Const">4</span>
++      <span class="Stat">then</span> <span class="Const">&quot;sup&quot;</span>
++      <span class="Stat">else</span> <span class="Const">&quot;inf&quot;</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> comp : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">string</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
++
++# comp <span class="Const">6</span> <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;sup&quot;</span>
+ </pre>
+ 
+   <div>
+-    to get it wrapped, the most common solution is to convert it
+-    to a variant list:
++    Afin de garantir le type retourn&eacute; par la structure if, ses deux branches
++    <code><span class="Stat">then</span></code> et <code><span class="Stat">else</span></code>
++    doivent imp&eacute;rativement retourner des &eacute;l&eacute;ments de m&ecirc;me type
++    (ce qui est donc le type de l'ensemble de l'expression).
+   </div>
+-<pre>
+-type state =
+-  | ShiftMask
+-  | LockMask
+-  | ControlMask
+-  | Mod1Mask
+ 
+-type state_mask = state list
+-</pre>
+ 
+-  <div>
+-    As previously build a table with the C values in the same <em>exact</em>
+-    order than in the OCaml variant, and iter all items of the caml list
+-    to set the C bit field accordingly:
++  <div class="nb">
++    Le seul cas o&ugrave; il n'y a pas besoin de sp&eacute;cifier la seconde branche 
++    <code><span class="Stat">else</span></code>
++    c'est lorsque la premi&egrave;re branche est de type &laquo;&nbsp;unit&nbsp;&raquo;.
+   </div>
+ <pre>
+-static const int state_mask_table[] = {
+-    ShiftMask,
+-    LockMask,
+-    ControlMask,
+-    Mod1Mask
+-};
+-
+-static inline int
+-state_mask_val( value mask_list )
+-{
+-    int c_mask = 0; 
+-    while ( mask_list != Val_emptylist )
+-    {
+-        value head = Field(mask_list, 0);
+-        c_mask |= state_mask_table[Long_val(head)];
+-        mask_list = Field(mask_list, 1);
+-    }
+-    return c_mask;
+-}
+-</pre>
++# <span class="Stat">let</span> is_equal_to_5 this <span class="Stat">=</span>
++    <span class="Stat">if</span> this <span class="Stat">=</span> <span class="Const">5</span>
++    <span class="Stat">then</span> print_endline <span class="Const">&quot;this is equal to 5&quot;</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> is_equal_to_5 : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+-  <div>
+-    And to convert the C bit field to the OCaml variant list,
+-    you need to test the bit of every field, and if it matches
+-    push the associated OCaml value to the list:
+-  </div>
+-<pre>
+-#define Val_ShiftMask    Val_int(0)
+-#define Val_LockMask     Val_int(1)
+-#define Val_ControlMask  Val_int(2)
+-#define Val_Mod1Mask     Val_int(3)
+-
+-static value
+-Val_state_mask( int c_mask )
+-{
+-    CAMLparam0();
+-    CAMLlocal2(li, cons);
+-    li = Val_emptylist;
+-
+-    if (c_mask &amp; ShiftMask) {
+-        cons = caml_alloc(2, 0);
+-        Store_field( cons, 0, Val_ShiftMask );
+-        Store_field( cons, 1, li );
+-        li = cons;
+-    }
+-    if (c_mask &amp; LockMask) {
+-        cons = caml_alloc(2, 0);
+-        Store_field( cons, 0, Val_LockMask );
+-        Store_field( cons, 1, li );
+-        li = cons;
+-    }
+-    if (c_mask &amp; ControlMask) {
+-        cons = caml_alloc(2, 0);
+-        Store_field( cons, 0, Val_ControlMask );
+-        Store_field( cons, 1, li );
+-        li = cons;
+-    }
+-    if (c_mask &amp; Mod1Mask) {
+-        cons = caml_alloc(2, 0);
+-        Store_field( cons, 0, Val_Mod1Mask );
+-        Store_field( cons, 1, li );
+-        li = cons;
+-    }
++# is_equal_to_5  <span class="Const">3</span> <span class="Stat">;;</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ 
+-    CAMLreturn(li);
+-}
++# is_equal_to_5  <span class="Const">5</span> <span class="Stat">;;</span>
++<span class="Const">this is equal to 5</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+ 
+ 
+ 
+-  <!-- ========================================================= -->
+-
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_rawdata"><span>Exchanging Raw Data</span></h3>
++  <h2>Les Boucles</h2>
+ 
+-  <div>
+-    If you have to handle raw data, you can do so using the OCaml types
+-    <code>string</code> or <code>bytes</code>
+-    wherever there are array of bytes or void* in C.<br />
+-    On the OCaml side, strings and bytes are able to handle any character, included
+-    the possible '\000', but if you use <code>caml_copy_string()</code>
+-    to copy the raw data it will end at the first Null character, because
+-    it is considered as the string terminator in C.<br />
+-    Before ocaml 4.06.0 we used to use
+-    <code>caml_alloc_string()</code> and <code>memcpy()</code>,
+-    but now it is recommended to use 
+-    <code>caml_alloc_initialized_string()</code>:
+-  </div>
+-<pre>
+-#include &lt;caml/mlvalues.h&gt;
+-#include &lt;caml/alloc.h&gt;
+-#include &lt;string.h&gt;
+-
+-CAMLprim value get_raw_data( value unit )
+-{
+-    CAMLparam0();
+-    CAMLlocal1( ml_data );
+-    char * raw_data;
+-    int data_len;
+-    /*
+-     * initialise raw_data and data_len here 
+-     */
++  <h3 id="def_for">Boucle for</h3>
+ 
+-    ml_data = caml_alloc_initialized_string(data_len, raw_data);
+-
+-    CAMLreturn( ml_data );
+-}
++<pre>
++# <span class="Stat">for</span> var <span class="Stat">=</span> <span class="Const">2</span> <span class="Stat">to</span> <span class="Const">6</span> <span class="Stat">do</span>
++    print_endline <span class="Stat">(</span><span class="Const">&quot;var value is &quot;</span> <span class="Stat">^</span> <span class="Stat">(</span>string_of_int var<span class="Stat">))</span>
++  <span class="Stat">done</span>
++  <span class="Stat">;;</span>
++<span class="Const">var value is 2</span>
++<span class="Const">var value is 3</span>
++<span class="Const">var value is 4</span>
++<span class="Const">var value is 5</span>
++<span class="Const">var value is 6</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+ 
+-<!--
+-  <div>
+-    Notice that here it is possible not to use CAMLparam/CAMLreturn even if there 
+-    is an ocaml alloc, because there aren't any ocaml values used *after* the 
+-    ocaml alloc.
+-    In your code if there are some, do put the CAMLparam/CAMLreturn&nbsp;!
+-  </div>
+--->
+   <div>
+-    If the data chunk represents something like a matrix (an image for example)
+-    you will probably prefer to use an OCaml bigarray which is a very handy
+-    data structure for this task because it shares the same memory layout than
+-    in C.
++    Ici nous voyons appara&icirc;tre comme type de retours pour l'ensemble de
++    l'expression le type &laquo;&nbsp;unit&nbsp;&raquo;. En effet la structure
++    de contr&ocirc;le for correspond au type de programmation imp&eacute;rative,
++    et l'ensemble de l'expression contenue &agrave; l'int&eacute;rieur de la
++    structure 'for' doit &ecirc;tre de type &laquo;&nbsp;unit&nbsp;&raquo;.
+   </div>
+ 
+-  <hr />
+ 
+-  <div>
+-    In your code, if the buffer <code>raw_data</code> is C mallocated and then 
+-    filled by some process, it is even possible to only allocate an ocaml string
+-    and then get a pointer to the first byte of this ocaml string.
+-    So in such cases you will save one C malloc(), one C free(), and the memcpy()
+-    call.
+-  </div>
+-<pre>
+-CAMLprim value get_raw_data( value some_param )
+-{
+-    CAMLparam1( some_param );
+-    CAMLlocal1( ml_data );
+-    const char * raw_data;
+-    int data_len;
+-    /* do initialise data_len */
+-    ml_data = caml_alloc_string( data_len );
+-    raw_data = String_val(ml_data);
+-    /* 
+-       Now you can use raw_data and fill it as if it was
+-       a buffer of type (char *) of length data_len.
+-       (once given to ocaml it will be garbage-collected as every ocaml value)
+-    */
+-    CAMLreturn( ml_data );
+-}
++  <div class="nb">
++    Pour placer plusieurs instructions &agrave; l'int&eacute;rieur d'une
++    boucle for, utilisez le s&eacute;parateur point virgule ';' entre
++    chaque instruction comme ceci&nbsp;:
++  </div>
++<pre>
++# <span class="Stat">for</span> var <span class="Stat">=</span> <span class="Const">2</span> <span class="Stat">to</span> <span class="Const">6</span> <span class="Stat">do</span>
++    print_string <span class="Const">&quot;var value is &quot;</span> <span class="Stat">;</span>
++    print_int var <span class="Stat">;</span>
++    print_newline <span class="Const">()</span>
++  <span class="Stat">done</span>
++  <span class="Stat">;;</span>
++<span class="Const">var value is 2</span>
++<span class="Const">var value is 3</span>
++<span class="Const">var value is 4</span>
++<span class="Const">var value is 5</span>
++<span class="Const">var value is 6</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
++
+   <div>
+-    If you need to access to one byte of the buffer like this
+-    <code>raw_data[n]</code>,
+-    it is also possible to make the same access directly on the ocaml value like this
+-    <code>Byte(ml_data, n)</code>.<br />
+-    (And if raw_data was of type <code>(unsigned char *)</code> replace
+-    <code>Byte()</code> by
+-    <code>Byte_u()</code>.)
++    Pour &eacute;viter le style imp&eacute;ratif de cette structure de contr&ocirc;le,
++    OCaml fournit une alternative offrant d'autres possibilit&eacute;s,
++    adapt&eacute;e &agrave; un style de programmation fonctionnelle.
+   </div>
+ 
+ 
++  <h3 id="def_funcloop">Les Boucles avec des Fonctions</h3>
+ 
+-  <!-- ========================================================= -->
+-
+-  <hr />
+-
+-  <h3 id="ref_5params"><span>More than 5 parameters</span></h3>
+-
+-  <div>
+-    There is a special case for OCaml functions that have more than 5 parameters,
+-    in such cases you have to provide 2 C functions, as you can see below:
++  <div class="nb">
++    Il est possible de r&eacute;aliser des boucles gr&acirc;ce &agrave; des fonctions
++    qui s'appellent elles-m&ecirc;mes, ce qui r&eacute;alise la boucle.<br />
++    Il faut ajouter le mot-clef <code>'<span class="Stat">rec</span>'</code> (pour r&eacute;cursif)
++    lors de la d&eacute;finition de ces fonctions.
+   </div>
+ <pre>
+-external lots_of_params: p1:int -&gt; p2:int -&gt; p3:int -&gt;
+-                         p4:int -&gt; p5:int -&gt; p6:int -&gt; p7:int -&gt; unit
+-    = "lotprm_bytecode"
+-      "lotprm_native"
+-</pre>
++# <span class="Stat">let</span> <span class="Stat">rec</span> loop a <span class="Stat">=</span>
++    print_int a<span class="Stat">;</span>
++    print_newline <span class="Const">()</span><span class="Stat">;</span>
++    <span class="Stat">if</span> a <span class="Stat">&gt;</span> <span class="Const">0</span> <span class="Stat">then</span>
++      loop <span class="Stat">(</span>a - <span class="Const">1</span><span class="Stat">)</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> loop : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+-<pre>
+-CAMLprim value
+-lotprm_native( value p1, value p2, value p3,
+-               value p4, value p5, value p6, value p7 )
+-{
+-    printf("1(%d) 2(%d) 3(%d) 4(%d) 5(%d) 6(%d) 7(%d)\n",
+-           Int_val(p1), Int_val(p2), Int_val(p3),
+-           Int_val(p4), Int_val(p5), Int_val(p6), Int_val(p7) );
+-    return Val_unit;
+-}
+-
+-CAMLprim value
+-lotprm_bytecode( value * argv, int argn )
+-{
+-    return lotprm_native( argv[0], argv[1], argv[2],
+-                          argv[3], argv[4], argv[5], argv[6] );
+-}
++# loop <span class="Const">5</span> <span class="Stat">;;</span>
++<span class="Const">5</span>
++<span class="Const">4</span>
++<span class="Const">3</span>
++<span class="Const">2</span>
++<span class="Const">1</span>
++<span class="Const">0</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+-  <div>
+-    And as you can see the function that will be called in bytecode
+-    compiled programs have a different prototype.
+-    Then in the bytecode function, the common and easiest solution
+-    is to call the native one.
++  <div class="nt">
++    Le grand danger cependant avec des boucles r&eacute;alis&eacute;es de cette
++    mani&egrave;re est d'en &eacute;crire une qui ne s'arr&ecirc;te jamais.<br />
++    Il faut donc pr&ecirc;ter un soin tout particulier
++    &agrave; la condition d'arr&ecirc;t.<br />
++    Dans l'exemple ci-dessus, la fonction s'appelle elle-m&ecirc;me avec
++    un argument sans cesse inf&eacute;rieur, il nous est donc possible de
++    r&eacute;aliser le rebouclage que lorsque l'argument est sup&eacute;rieur
++    &agrave; une certaine valeur, puisqu'il descendra forc&eacute;ment &agrave;
++    un moment en dessous de celle-ci.
+   </div>
+ 
+-  <div>
+-    And another detail for those functions when you need to protect the values from
+-    the garbage collector, the macros CAMLparam<em>N</em>() exist only for
+-    <em>N</em> from 1 to 5.
+-    Then put the 5 first parameters in CAMLparam5(), and use additional
+-    CAML<span style="color:#05C">x</span>param<em>N</em>()
+-    macros which exist too with <em>N</em> from 1 to 5.
+-    So for example if you have 13 parameters, use one CAMLparam5(), one
+-    CAMLxparam5() and one CAMLxparam3().
+-    You have to use only one macro without the "x" in the middle, and you can
+-    use as many of the one with the "x".<br />
+-    Here is the same function with these macros:
+-  </div>
+-<pre>
+-CAMLprim value
+-lotprm_native( value p1, value p2, value p3,
+-               value p4, value p5, value p6, value p7 )
+-{
+-    CAMLparam5(p1, p2, p3, p4, p5);
+-    CAMLxparam2(p6, p7);
+-
+-    printf("1(%d) 2(%d) 3(%d) 4(%d) 5(%d) 6(%d) 7(%d)\n",
+-           Int_val(p1), Int_val(p2), Int_val(p3),
+-           Int_val(p4), Int_val(p5), Int_val(p6), Int_val(p7) );
+-
+-    CAMLreturn(Val_unit);
+-}
+-
+-CAMLprim value
+-lotprm_bytecode( value * argv, int argn )
+-{
+-    return lotprm_native( argv[0], argv[1], argv[2],
+-                          argv[3], argv[4], argv[5], argv[6] );
+-}
+-</pre>
++<!-- TODO: another tutorial on the tail recursive functions -->
+ 
+ 
+-
+-  <!-- ========================================================= -->
+-
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_exception"><span>Raising Exceptions</span></h3>
+ 
++  <h2 id="def_match">match</h2>
+   <div>
+-    Raising the predefined exceptions of OCaml is very easy.
+-    For example for raising the <code>Invalid_argument</code> exception,
+-    the C function is:
++    Dans son utilisation basique la plus rudimentaire, cette structure de
++    contr&ocirc;le pourrait &ecirc;tre vue comme un &eacute;quivalent de
++    la structure de contr&ocirc;le &laquo;&nbsp;switch&nbsp;&raquo; que
++    l'on connait dans d'autres langages de programmation et de script.<br />
++    (&Agrave; ceci pr&ecirc;t que &laquo;&nbsp;match&nbsp;&raquo; permet
++    d'aller bien au del&agrave;.)
+   </div>
+-<pre>
+-    caml_invalid_argument("Error message");
+-</pre>
++
+   <div>
+-    And to raise an exception <code>Failure</code>:
++    La structure de contr&ocirc;le 'match' permet de diriger l'ex&eacute;cution
++    du programme en fonction de diff&eacute;rentes valeures, ou motifs.
+   </div>
+-<pre>
+-    caml_failwith("Error message");
+-</pre>
+-  <div>
+-    The header file to include when using these functions is:
++
++  <div class="nb">
++    Voici un exemple simple&nbsp;:
+   </div>
+ <pre>
+-#include &lt;caml/fail.h&gt;
+-</pre>
++# <span class="Stat">let</span> v <span class="Stat">=</span> <span class="Const">2</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> v : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">2</span>
+ 
++# <span class="Stat">match</span> v <span class="Stat">with</span>
++  <span class="Stat">|</span> <span class="Const">1</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;un&quot;</span>
++  <span class="Stat">|</span> <span class="Const">2</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;deux&quot;</span>
++  <span class="Stat">|</span> <span class="Const">3</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;trois&quot;</span>
++  <span class="Stat">|</span> <span class="Stat">_</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;je ne sais pas compter au del&agrave; de trois&quot;</span>
++  <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;deux&quot;</span>
++</pre>
+ 
+   <div>
+-    You can find more about it
+-    <span class="for_screen">
+-      <a href=
+-      "https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#ss:c-exceptions"
+-      >in the official manual</a>
+-    </span>
+-    <span class="for_print">
+-      on the page<br />
+-      <a href="#">https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#ss:c-exceptions</a>
+-      <br />in section <strong>20.4.5</strong>
+-    </span>.
++    Ici la valeur de 'v' est 2, l'&eacute;l&eacute;ment correspondant
++    apr&egrave;s la fl&egrave;che est donc retourn&eacute;.
+   </div>
+ 
+ 
+   <div>
+-    And if your module defines custom exceptions, it is possible to raise these
+-    from C as explained
+-    <span class="for_screen">
+-      <a href=
+-      "https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#ss:c-register-exn"
+-      >here in the official manual</a>
+-    </span>
+-    <span class="for_print">
+-      on the page<br />
+-      <a href="#">https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#ss%3Ac-register-exn</a>
+-      <br />in section <strong>20.7.3</strong>
+-    </span>.
++    L'englobement du &laquo;&nbsp;match&nbsp;&raquo; doit toujours &ecirc;tre
++    exhaustif, d'une part, et toutes les expressions suivant chaque englobement
++    doivent &ecirc;tre de m&ecirc;me type. Ce type sera ainsi le type de
++    l'ensemble de l'expression &laquo;&nbsp;match&nbsp;&raquo;.
++    (encore cette fameuse histoire de typage fort destin&eacute; &agrave;
++    assurer le bon fonctionnement de votre code).<br />
++    Le dernier englobement &laquo;&nbsp;_&nbsp;&raquo; peut &ecirc;tre utilis&eacute;
++    si aucune des autres entr&eacute;es pr&eacute;c&eacute;dantes ne correspond.<br />
++    <small>
++      (L'englobement &laquo;&nbsp;_&nbsp;&raquo; est &agrave; peu pr&egrave;s
++      &eacute;quivalent de la directive &laquo;&nbsp;default&nbsp;&raquo; des
++      structures 'switch' d'autres langages.)
++    </small>
++    <br />
++    L'englobement est parfois exhaustif sans celui-ci
++    (voir l'exemple &agrave; la fin).
+   </div>
+ 
+ 
++  <div class="nb">
++    Pr&eacute;c&eacute;demment nous avions vu comment empiler un
++    &eacute;l&eacute;ment &agrave; une liste.
++    Voici comment en d&eacute;piler un&nbsp;:
++  </div>
++<pre>
++# <span class="Stat">let</span> li <span class="Stat">=</span> <span class="Stat">[</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">32</span> <span class="Stat">]</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> li : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">2</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">32</span><span class="Stat">]</span>
++
++# <span class="Stat">match</span> li <span class="Stat">with</span>
++  <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span> tail
++  <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span> <span class="Const">[]</span>
++  <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">8</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">32</span><span class="Stat">]</span>
++<span class="Comm">(* Dans le jargon, on d&eacute;signe le premier &eacute;l&eacute;ment d'une liste comme</span>
++<span class="Comm">   sa t&ecirc;te (head en anglais), et le reste comme sa suite (tail).</span>
++<span class="Comm">   Ici l'expression renvoie la suite de la liste nomm&eacute;e &laquo;&nbsp;li&nbsp;&raquo;. *)</span>
++
++# <span class="Stat">match</span> li <span class="Stat">with</span>
++  <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span>
++      print_string <span class="Const">&quot;the head is &quot;</span><span class="Stat">;</span>
++      print_int head<span class="Stat">;</span>
++      print_newline <span class="Const">()</span><span class="Stat">;</span>
++  <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span>
++      print_endline <span class="Const">&quot;the list is empty&quot;</span><span class="Stat">;</span>
++  <span class="Stat">;;</span>
++<span class="Const">the head is 2</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
++</pre>
+ 
+-  <!-- ========================================================= -->
++<!--
++<pre>
++# <span class="Stat">match</span> li <span class="Stat">with</span>
++  <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span> <span class="Const">Some</span> head
++  <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span> <span class="Const">None</span>
++  <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">option</span> <span class="Stat">=</span> <span class="Const">Some</span> <span class="Const">2</span>
++</pre>
++-->
+ 
+-  <hr />
+ 
+-  <h3 id="ref_ptr"><span>Pointers to C structures</span></h3>
+ 
+   <div>
+-    Often C libraries use types defined from structures or pointers
+-    to structures. OCaml can safely handle pointers to memory allocated areas.
+-    To achieve this task, the simpler method used in the past was to cast the
+-    pointers to and from the type <code>(value)</code> which is called "naked
+-    pointers".<br />
+-    As explained in the <strong>Chapter 20</strong> of the manual (Interfacing C with OCaml)
+-    in section
+-    <a href="https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#ss:c-outside-head"
+-      >20.2.3 - Pointers outside the heap</a>:
+-    <br />
+-    <em>"Starting with OCaml&nbsp;4.11, this usage is deprecated
+-      and will stop being supported in OCaml&nbsp;5.00."</em>
+-    <br />
+-    <!--
+-    Remember to provide a function to free your
+-    allocated value from the C side of your program.&nbsp; Usually this means
+-    providing a function to free the allocated memory with interface to that
+-    on the OCaml side.
+-    In case of a library this is equivalent to using the destroy function
+-    associated with a particular type.
+-    -->
++    <small>(ici on voit aussi appara&icirc;tre du commentaire entre les
++    s&eacute;quences
++      '<code><span class="Comm">(*</span></code>' et
++      '<code><span class="Comm">*)</span></code>')</small>
+   </div>
+ 
+   <div>
+-    A simple method is to wrap these pointers with a native integer.
+-    It is handy to provide convertion functions, usually called
+-    <code>Val_ctype()</code> and <code>CType_val()</code>, as follow:
++    En utilisant cette possibilit&eacute; de d&eacute;sempilement au sein
++    d'une boucle faite avec une fonction r&eacute;cursive, cela permet alors
++    de parcourir tous les &eacute;l&eacute;ments d'une liste.
+   </div>
+ 
+ <pre>
+-#include &lt;stdio.h&gt;
+-#include &lt;caml/mlvalues.h&gt;
+-#include &lt;caml/alloc.h&gt;
++# <span class="Stat">let</span> li <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">2</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">]</span> <span class="Stat">in</span>
++  <span class="Stat">let</span> <span class="Stat">rec</span> loop li <span class="Stat">=</span>
++    <span class="Stat">match</span> li <span class="Stat">with</span>
++    <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span>
++        print_int head<span class="Stat">;</span>
++        print_newline <span class="Const">()</span><span class="Stat">;</span>
++        loop tail<span class="Stat">;</span>
++    <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span>
++        print_endline <span class="Const">&quot;End Of List&quot;</span><span class="Stat">;</span>
++  <span class="Stat">in</span>
++  loop li
++  <span class="Stat">;;</span>
++<span class="Const">2</span>
++<span class="Const">3</span>
++<span class="Const">5</span>
++<span class="Const">7</span>
++<span class="Const">End</span> <span class="Const">Of</span> <span class="Const">List</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
++</pre>
+ 
+-typedef struct _obj_st {
+-    double d;
+-    int i;
+-    char c;
+-} obj_st;
+ 
+-static value Val_objst(obj_st * p)
+-{
+-    return caml_copy_nativeint((intnat) p);
+-}
+-
+-static obj_st * Objst_val(value v)
+-{
+-    return (obj_st *) Nativeint_val(v);
+-}
++  <!-- ======================================================== -->
+ 
+-CAMLprim value
+-wrapping_ptr_ml2c( value d, value i, value c )
+-{
+-    obj_st * my_obj;
+-    my_obj = malloc(sizeof(obj_st));
+-    my_obj-&gt;d = Double_val(d);
+-    my_obj-&gt;i = Int_val(i);
+-    my_obj-&gt;c = Int_val(c);
+-    return Val_objst(my_obj);
+-}
++  <hr />
+ 
+-CAMLprim value
+-dump_ptr( value ml_ptr )
+-{
+-    obj_st * my_obj;
+-    my_obj = Objst_val(ml_ptr);
+-    printf(" d: %g\n i: %d\n c: %c\n",
+-            my_obj-&gt;d,
+-            my_obj-&gt;i,
+-            my_obj-&gt;c );
+-    return Val_unit;
+-}
+ 
+-CAMLprim value
+-free_ptr( value ml_ptr )
+-{
+-    obj_st * my_obj;
+-    my_obj = Objst_val(ml_ptr);
+-    free(my_obj);
+-    return Val_unit;
+-}
+-</pre>
++  <h2 id="def_iter">"Foreach"</h2>
++  <h4>(Iteration sur les listes et les tableaux)</h4>
+ 
+   <div>
+-    Then this value can be hidden in an abstract type on the OCaml side:
++    Si vous connaissez d'autres langages et que vous recherchez un
++    &eacute;quivalent de la structure foreach, la m&ecirc;me chose peut-&ecirc;tre
++    r&eacute;alis&eacute;e pour parcourir tous les &eacute;l&eacute;ments d'une
++    liste avec les fonctions &laquo;&nbsp;iter&nbsp;&raquo; (imp&eacute;ratif)
++    et &laquo;&nbsp;map&nbsp;&raquo; (fonctionnel) du module
++    <a href="http://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html"
++    >'List'</a>
++    de la librairie standard d'OCaml.
+   </div>
+-<pre>
+-type t
+-external abs_get: float -&gt; int -&gt; char -&gt; t = "wrapping_ptr_ml2c"
+-external print_t: t -&gt; unit = "dump_ptr"
+-external free_t: t -&gt; unit = "free_ptr"
+-</pre>
+ 
+ <pre>
+-# let ty = abs_get 255.9 107 'K' in
+-  print_t ty;
+-  free_t ty;
+-  ;;
+- d: 255.9
+- i: 107
+- c: K
+-- : unit = ()
++# <span class="Stat">let</span> for_each item <span class="Stat">=</span> item <span class="Stat">*</span> <span class="Const">2</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> for_each : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
++
++# <span class="Stat">let</span> my_list <span class="Stat">=</span> <span class="Stat">[</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">22</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">16</span> <span class="Stat">]</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> my_list : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">5</span><span class="Stat">;</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">22</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">16</span><span class="Stat">]</span>
++
++# <span class="Mod">List</span>.map  for_each  my_list <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">10</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">44</span><span class="Stat">;</span> <span class="Const">6</span><span class="Stat">;</span> <span class="Const">32</span><span class="Stat">]</span>
+ </pre>
++  <div class="nt">
++    Ici la fonction <strong>for_each</strong> est appliqu&eacute;e successivement
++    &agrave; chaque &eacute;l&eacute;ment de la liste <strong>my_list</strong>.
++    <br />
++    Ainsi la fonction prend en argument un des &eacute;l&eacute;ments de la
++    liste (qui doit donc avoir le m&ecirc;me type que l'arguement de la fonction),
++    et les r&eacute;sultats successifs de la fonction sont empil&eacute;s dans
++    une nouvelle liste qui est le r&eacute;sultat global de l'appel &agrave;
++    <code><span class="Mod">List</span>.map for_each my_list</code>.
++    Cette op&eacute;ration fonctionne donc comme un filtre.
++  </div>
+ 
+ 
+   <div>
+-    Another solution is to make an encapsulation of the pointer inside a block
+-    with <code>Abstract_tag</code>.<br />
+-    The 2 functions <code>Val_objst()</code> and <code>Objst_val()</code> then become:
++    Si la fonction for_each n'est utilis&eacute;e qu'&agrave; un seul endroit
++    du code, elle peut &ecirc;tre d&eacute;finie localement au sein de
++    l'expression en cours, plut&ocirc;t que globalement.
++    (On pourrait tenter la comparaison avec les fonctions inline de C++)
++    Il faut alors la terminer par 'in' &agrave; la place de ';;' comme ceci&nbsp;:
+   </div>
+ 
+-<pre>
+-static value Val_objst(obj_st * p)
+-{
+-  value v = caml_alloc(1, Abstract_tag);
+-  *((obj_st **) Data_abstract_val(v)) = p;
+-  return v;
+-}
+ 
+-static obj_st * Objst_val(value v)
+-{
+-  return *((obj_st **) Data_abstract_val(v));
+-}
++<pre>
++# <span class="Stat">let</span> each item <span class="Stat">=</span>
++    item <span class="Stat">+</span> <span class="Const">4</span>
++  <span class="Stat">in</span>
++  <span class="Mod">List</span>.map each <span class="Stat">[</span><span class="Const">10</span><span class="Stat">;</span> <span class="Const">50</span><span class="Stat">;</span> <span class="Const">30</span><span class="Stat">;</span> <span class="Const">80</span><span class="Stat">;</span> <span class="Const">20</span><span class="Stat">]</span>
++  <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">14</span><span class="Stat">;</span> <span class="Const">54</span><span class="Stat">;</span> <span class="Const">34</span><span class="Stat">;</span> <span class="Const">84</span><span class="Stat">;</span> <span class="Const">24</span><span class="Stat">]</span>
+ </pre>
+ 
+   <div>
+-    And if you want to use <code>Objst_val()</code> as an "l-value" (an element on left
+-    in the C syntax), you can use a macro instead:
++    Elle ne sera alors disponible et accessible que dans l'expression
++    en cours, comme vous pouvez le v&eacute;rifier&nbsp;:
+   </div>
+-
+ <pre>
+-#define Objst_val(v) \
+-  *((obj_st **) Data_abstract_val(v))
++# each <span class="Stat">;;</span>
++<span class="Const">Unbound value each</span>
+ </pre>
+ 
++<!-- WIP -->
+ 
+-  <!-- ========================================================= -->
+-
+-<!--
+-
+-  <hr />
+-
+-  <h3 id="ref_finalise"><span>Finalisation of C objects</span></h3>
+-
+-
+-  <div>
+-    To finalise those abstract type that represent C object, don't try
+-    to use the <code>Gc.finalise</code> like this:
++  <div class="nb">
++    Une fonction anonyme peut aussi &ecirc;tre utilis&eacute;e&nbsp;:
+   </div>
+ <pre>
+-let abs_get f i c =
+-  let t = abs_get f i c in
+-  Gc.finalise free_t t;     (* doesn't work *)
+-  (t)
+-;;
++# <span class="Mod">List</span>.iter
++    <span class="Stat">(fun</span> i <span class="Stat">-&gt;</span> print_int i <span class="Stat">;</span> print_newline <span class="Const">()</span><span class="Stat">)</span>
++    <span class="Stat">[</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">64</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">16</span> <span class="Stat">]</span>
++  <span class="Stat">;;</span>
++<span class="Const">8</span>
++<span class="Const">64</span>
++<span class="Const">2</span>
++<span class="Const">16</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+-  <div>
+-    because this function does only work with heap-allocated values.<br />
+-    But you can bypass this by creating a new type that mixes the abstract type
+-    with heap-allocated value:
+-  </div>
+-<pre>
+-type u = {t:t; s:string}
+ 
+-let free_t v = free_t v.t ;;
+-let print_t v = print_t v.t ;;
++  <div>&nbsp;</div>
+ 
+-let abs_get f i c =
+-  let t = abs_get f i c in
+-  let u = {t=t; s=" "} in
+-  Gc.finalise free_t u;
+-  (u)
+-;;
++<pre>
++# <span class="Stat">let</span> high_level_languages <span class="Stat">=</span> <span class="Stat">[</span>
++    <span class="Const">&quot;Lisp&quot;</span><span class="Stat">;</span>
++    <span class="Const">&quot;Perl&quot;</span><span class="Stat">;</span>
++    <span class="Const">&quot;Python&quot;</span><span class="Stat">;</span>
++    <span class="Const">&quot;PHP&quot;</span><span class="Stat">;</span>
++    <span class="Const">&quot;Ruby&quot;</span><span class="Stat">;</span>
++    <span class="Const">&quot;OCaml&quot;</span>
++  <span class="Stat">]</span> <span class="Stat">in</span>
++  <span class="Mod">List</span>.iter <span class="Stat">(fun</span> lang <span class="Stat">-&gt;</span> print_endline lang<span class="Stat">)</span> high_level_languages
++  <span class="Stat">;;</span>
++<span class="Const">Lisp</span>
++<span class="Const">Perl</span>
++<span class="Const">Python</span>
++<span class="Const">PHP</span>
++<span class="Const">Ruby</span>
++<span class="Const">OCaml</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
++
+   <div>
+-    This is a simple way, but there is an other "more official" way to
+-    achieve the same effect from the C side,
+-    which is described in the next paragraph.
++    Pour parcourir les &eacute;l&eacute;ments d'un tableau au lieu d'une liste,
++    il existe deux fonctions semblables &laquo;&nbsp;iter&nbsp;&raquo; et
++    &laquo;&nbsp;map&nbsp;&raquo; dans le module
++    <a href="http://caml.inria.fr/pub/docs/manual-ocaml/libref/Array.html#VALiter"
++     >'Array'</a>.
+   </div>
+ 
+--->
+ 
+ 
+-  <!-- ========================================================= -->
++  <!-- ======================================================== -->
+ 
+   <hr />
+ 
+-  <h3 id="ref_custom"><span>Custom Operations Structure</span></h3>
+-
++  <h2 id="def_record">Les Enregistrements</h2>
+ 
+   <div>
+-    You can use the function <code>caml_alloc_custom()</code> to store datas
+-    of a given size.
+-    The size of this data is given as the second parameter of this function.
+-    The first parameter is a <code>custom_operations</code> structure,
+-    which can be used to provide functions associated with
+-    this ocaml value.
+-    In the example below no functions are associated, so the 
+-    <code>custom_operations</code> structure is filled with the default functions
+-    (which are in fact defined as <code>NULL</code> in
+-    <code>&lt;caml/custom.h&gt;</code>)
++    (ou "record" en anglais)<br />
++    Ce sont des types qui doivent &ecirc;tre d&eacute;clar&eacute;s au
++    pr&eacute;alable, c'est &agrave; dire d&eacute;finis par l'utilisateur ou
++    dans des modules.
++    Ce type ressemble aux tuples sauf qu'il permet de nommer les diff&eacute;rents
++    champs, ce qui en am&eacute;liore la lisibilit&eacute;, et le nom des champs
++    permet d'acc&eacute;der plus facilement qu'avec un tuple &agrave; chaque
++    &eacute;l&eacute;ments de ce type&nbsp;:
+   </div>
+ 
+-<pre>
+-#include &lt;caml/custom.h&gt;
+-#include &lt;string.h&gt;
++<!--
++# type someone = { name: string; phone: string } ;;
++type someone = { name : string; phone : string; }
+ 
+-typedef struct _obj_st {
+-    double d;
+-    int i;
+-    char c;
+-} obj_st;
++# let doe = {
++    name = "Doe";
++    phone = "02.30.54.29";
++} ;;        
++val doe : someone = {name = "Doe"; phone = "02.30.54.29"}
+ 
+-static struct custom_operations objst_custom_ops = {
+-    identifier: "obj_st handling",
+-    finalize:    custom_finalize_default,
+-    compare:     custom_compare_default,
+-    hash:        custom_hash_default,
+-    serialize:   custom_serialize_default,
+-    deserialize: custom_deserialize_default
+-};
++# doe.phone ;;
++- : string = "02.30.54.29"
+ 
+-static value copy_obj( obj_st *some_obj )
+-{
+-    CAMLparam0();
+-    CAMLlocal1(v);
+-    v = caml_alloc_custom( &amp;objst_custom_ops, sizeof(obj_st), 0, 1);
+-    memcpy( Data_custom_val(v), some_obj, sizeof(obj_st) );
+-    CAMLreturn(v);
+-}
++# let doe = { doe with phone = "02.30.54.29" } ;;
++val doe : someone = {name = "Doe"; phone = "02.30.54.29"}
++-->
++<pre>
++<span class="PreProc">#</span> <span class="Stat">type</span> personne <span class="Stat">=</span> <span class="Stat">{</span> nom: <span class="Type">string</span><span class="Stat">;</span> telephone: <span class="Type">string</span><span class="Stat">;</span> <span class="Stat">}</span> <span class="Stat">;;</span>
++<span class="Stat">type</span> personne <span class="Stat">=</span> <span class="Stat">{</span> nom : <span class="Type">string</span><span class="Stat">;</span> telephone : <span class="Type">string</span><span class="Stat">;</span> <span class="Stat">}</span>
+ 
+-CAMLprim value
+-get_finalized_obj( value d, value i, value c )
+-{
+-    CAMLparam3( d, i, c );
+-    CAMLlocal1(ml_obj);
+-
+-    obj_st my_obj;
+-    my_obj.d = Double_val(d);
+-    my_obj.i = Int_val(i);
+-    my_obj.c = Int_val(c);
++<span class="PreProc">#</span> <span class="Stat">let</span> doe <span class="Stat">=</span> <span class="Stat">{</span>
++    nom <span class="Stat">=</span> <span class="Const">&quot;Doe&quot;</span><span class="Stat">;</span>
++    telephone <span class="Stat">=</span> <span class="Const">"02.30.54.29"</span><span class="Stat">;</span>
++<span class="Stat">}</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> doe : personne <span class="Stat">=</span> <span class="Stat">{</span>nom <span class="Stat">=</span> <span class="Const">&quot;Doe&quot;</span><span class="Stat">;</span> telephone <span class="Stat">=</span> <span class="Const">"02.30.54.29"</span><span class="Stat">;</span> <span class="Stat">}</span>
+ 
+-    ml_obj = copy_obj( &amp;my_obj );
++<span class="PreProc">#</span> doe.telephone <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">"02.30.54.29"</span>
++</pre>
+ 
+-    CAMLreturn(ml_obj);
+-}
+ 
+-CAMLprim value
+-access_obj( value v )
+-{
+-    obj_st * my_obj;
+-    my_obj = (obj_st *) Data_custom_val(v);
+-    printf(" d: %g\n i: %d\n c: %c\n",
+-            my_obj-&gt;d,
+-            my_obj-&gt;i,
+-            my_obj-&gt;c );
+-    return Val_unit;
+-}
+-</pre>
++  <hr />
+ 
+-<pre>
+-type obj
+-external new_obj: float -&gt; int -&gt; char -&gt; obj = "get_finalized_obj"
+-external dump_obj: obj -&gt; unit = "access_obj"
+-</pre>
++  <h2 id="def_record_imup">Les Enregistrements&nbsp;: Mise &agrave; Jour Immuable</h2>
+ 
+   <div>
+-    The values obtained by the function <code>new_abs</code> won't need
+-    an explicite free as in the previous paragraph
+-    <a href="#ref_ptr">Pointers to C structures</a>,
+-    OCaml will finalise these values when the garbage collection will occur.
++    (ou "immutable update" en anglais)<br />
++    En programmation fonctionnelle les variables ne sont pas sens&eacute;es changer de valeur,
++    pour obtenir un nouvel enregistrement avec un des champs mis &agrave; jour,
++    en OCaml on proc&egrave;de comme suit&nbsp;:
+   </div>
+-
++<!--
++# let doe = { doe with telephone = "02.74.16.48" } ;;
++val doe : personne = {nom = "Doe"; telephone = "02.74.16.48"}
++-->
+ <pre>
+-# let a = Array.init 20 (fun i -&gt; new_obj (float i) i 'A') in
+-  dump_obj a.(9);
+-  ;;
+- d: 9
+- i: 9
+- c: A
+-- : unit = ()
++<span class="PreProc">#</span> <span class="Stat">let</span> doe <span class="Stat">=</span> <span class="Stat">{</span> doe <span class="Stat">with</span> telephone <span class="Stat">=</span> <span class="Const">"02.74.16.48"</span> <span class="Stat">}</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> doe : personne <span class="Stat">=</span> <span class="Stat">{</span>nom <span class="Stat">=</span> <span class="Const">&quot;Doe&quot;</span><span class="Stat">;</span> telephone <span class="Stat">=</span> <span class="Const">"02.74.16.48"</span><span class="Stat">}</span>
+ </pre>
+ 
+ 
++<!--
++    Champs polymorphes
+ 
+-  <!-- ========================================================= -->
++type 'a info = { nom : string; valeur : 'a } ;;
+ 
+-  <hr />
++-->
+ 
+-  <h3 id="ref_custfinal"><span>Custom Finalisation</span></h3>
+ 
++  <!-- ======================================================== -->
++  <hr />
++
++  <h2>Les structures mutables</h2>
+ 
+   <div>
+-    Very often C structures contain allocated members, in such case
+-    you have to use a custom finalisation function to free these members.<br />
+-    You can see this in the exemple below which is very close to the previous
+-    example.
+-    Here the member <code>str</code> of the C structure is allocated, and needs
+-    to be freed in the custom finalisation function:
++    Les champs d&eacute;clar&eacute;s mutable au moment de la d&eacute;finition pourront &ecirc;tre modifi&eacute;s.
++    <br />
++    Par exemple :
+   </div>
+ 
+ <pre>
+-typedef struct _fobj {
+-    double d;
+-    int i;
+-    char * str;
+-} fobj;
++<span class="PreProc">#</span> <span class="Stat">type</span> personne <span class="Stat">=</span> <span class="Stat">{</span> nom : <span class="Type">string</span><span class="Stat">;</span> <span class="Stat">mutable</span> age : <span class="Type">int</span> <span class="Stat">}</span> <span class="Stat">;;</span>
++<span class="Stat">type</span> personne <span class="Stat">=</span> <span class="Stat">{</span> nom : <span class="Type">string</span><span class="Stat">;</span> <span class="Stat">mutable</span> age : <span class="Type">int</span><span class="Stat">;</span> <span class="Stat">}</span>
++<span class="Comm">(* permettra de modifier le champ age, mais pas le champ nom. *)</span>
+ 
+-void finalize_fobj( value v )
+-{
+-    fobj * my_obj;
+-    my_obj = (fobj *) Data_custom_val(v);
+-    free( my_obj-&gt;str );
+-    puts("fobj freed done");
+-}
++<span class="PreProc">#</span> <span class="Stat">let</span> p <span class="Stat">=</span> <span class="Stat">{</span> nom <span class="Stat">=</span> <span class="Const">&quot;Paul&quot;</span><span class="Stat">;</span> age <span class="Stat">=</span> <span class="Const">23</span> <span class="Stat">}</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> p : personne <span class="Stat">=</span> <span class="Stat">{</span>nom <span class="Stat">=</span> <span class="Const">&quot;Paul&quot;</span><span class="Stat">;</span> age <span class="Stat">=</span> <span class="Const">23</span><span class="Stat">}</span>
+ 
+-static struct custom_operations fobj_custom_ops = {
+-    identifier: "fobj handling",
+-    finalize:  finalize_fobj,
+-    compare:     custom_compare_default,
+-    hash:        custom_hash_default,
+-    serialize:   custom_serialize_default,
+-    deserialize: custom_deserialize_default
+-};
+-
+-static value copy_fobj( fobj *some_obj )
+-{
+-    CAMLparam0();
+-    CAMLlocal1(v);
+-    v = caml_alloc_custom( &amp;fobj_custom_ops, sizeof(fobj), 0, 1);
+-    memcpy( Data_custom_val(v), some_obj, sizeof(fobj) );
+-    CAMLreturn(v);
+-}
++<span class="PreProc">#</span> <span class="Stat">let</span> anniversaire x <span class="Stat">=</span> x.age <span class="Stat">&lt;-</span> x.age + <span class="Const">1</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> anniversaire : personne <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> &lt;<span class="Stat">fun</span>&gt;
+ 
+-CAMLprim value
+-get_finalized_fobj( value d, value i, value str )
+-{
+-    CAMLparam3( d, i, str );
+-    CAMLlocal1(ml_obj);
+-    int len;
+-    fobj my_obj;
+-
+-    my_obj.d = Double_val(d);
+-    my_obj.i = Int_val(i);
+-
+-    len = caml_string_length(str) + 1;
+-    my_obj.str = malloc( len * sizeof(char) );
+-    memcpy( my_obj.str, String_val(str), len );
++<span class="PreProc">#</span> anniversaire p <span class="Stat">;;</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ 
+-    ml_obj = copy_fobj( &amp;my_obj );
++<span class="PreProc">#</span> p <span class="Stat">;;</span>
++- : personne <span class="Stat">=</span> <span class="Stat">{</span>nom <span class="Stat">=</span> <span class="Const">&quot;Paul&quot;</span><span class="Stat">;</span> age <span class="Stat">=</span> <span class="Const">24</span><span class="Stat">}</span>
+ 
+-    CAMLreturn(ml_obj);
+-}
++<span class="PreProc">#</span> p.nom <span class="Stat">&lt;-</span> <span class="Const">&quot;Maximilien&quot;</span><span class="Stat">;;</span>
++<span class="Err">Error:</span> The record field nom is not mutable
+ 
+-CAMLprim value
+-access_fobj( value v )
+-{
+-    fobj * my_obj;
+-    my_obj = (fobj *) Data_custom_val(v);
+-    printf(" d: %g\n i: %d\n str: %s\n",
+-            my_obj-&gt;d,
+-            my_obj-&gt;i,
+-            my_obj-&gt;str );
+-    return Val_unit;
+-}
+ </pre>
++<!--
+ 
+-<pre>
+-type fobj
+-external new_fobj: float -&gt; int -&gt; string -&gt; fobj = "get_finalized_fobj"
+-external dump_fobj: fobj -&gt; unit = "access_fobj"
+-</pre>
+-
+-  <div>
+-    You can see when values are finalised with the <code>printf()</code> message.
+-    In the script below calling <code>Gc.full_major</code> will produce the
+-    finalisation:
+-  </div>
+-
+-<pre>
+-let () =
+-  begin
+-    let f i = new_fobj (float i) i (String.make i '.') in
+-    let a = Array.init 20 f in
+-    dump_fobj a.(9);
+-  end;
+-  Gc.full_major ();
+-  print_endline "end test";
+-;;
+-</pre>
+-
+-
+-  <div>
+-    You can find more informations about the
+-
+-    <span class="for_screen">
+-      <a href="https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#s%3Ac-custom"
+-      >custom_operations structure</a>
+-    </span>
++type personne = { nom : string; mutable age : int } ;;
++(* permettra de modifier le champ age, mais pas le champ nom. *)
+ 
+-    <span class="for_print">
+-      custom_operations structure
+-      on the page<br />
+-      <a href="#"
+-      >https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#s%3Ac-custom</a>
+-      in section <strong>20.9.1</strong>
+-    </span>
++let p = { nom = "Paul"; age = 23 } ;;
++val p : personne = {nom = "Paul"; age = 23}
+ 
+-    in the offical manual.<br />
+-    This structure can be used too for other custom operations
+-    like <em>serialisation</em> and so on.
+-  </div>
++let anniversaire x = x.age <- x.age + 1 ;;
++val anniversaire : personne -> unit = <fun>
+ 
++p.nom <- "Maximilien" ;;
++Characters 0-17:
++The label nom is not mutable
+ 
++-->
+ 
+-  <!-- ========================================================= -->
+ 
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_constvrnt"><span>Variants with arguments</span></h3>
+-
++  <h2 id="def_variant">Les Variants</h2>
+ 
+   <div>
+-    Now the case of variants with parameters, as in this example:
++    Les variants sont &eacute;galement des types qui doivent &ecirc;tre
++    d&eacute;clar&eacute;s avec une d&eacute;finition.<br />
++    Voici un exemple&nbsp;:
+   </div>
+ 
+ <pre>
++# <span class="Stat">type</span> shape <span class="Stat">=</span> <span class="Const">Square</span> <span class="Stat">|</span> <span class="Const">Circle</span> <span class="Stat">|</span> <span class="Const">Triangle</span> <span class="Stat">;;</span>
++<span class="Stat">type</span> shape <span class="Stat">=</span> <span class="Const">Square</span> <span class="Stat">|</span> <span class="Const">Circle</span> <span class="Stat">|</span> <span class="Const">Triangle</span>
+ 
+-type pvar =
+-  | P0_a
+-  | P1_a of int
+-  | P2_a of int * int
+-  | P0_b
+-  | P1_b of int
+-  | P2_b of int * int
+-
+-external handle_pvar: pvar -&gt; unit = "param_variant"
++# <span class="Stat">let</span> string_of_shape sh <span class="Stat">=</span>
++    <span class="Stat">match</span> sh <span class="Stat">with</span>
++    <span class="Stat">|</span> <span class="Const">Square</span>   <span class="Stat">-&gt;</span> <span class="Const">&quot;square&quot;</span>
++    <span class="Stat">|</span> <span class="Const">Triangle</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;triangle&quot;</span>
++    <span class="Stat">|</span> <span class="Const">Circle</span>   <span class="Stat">-&gt;</span> <span class="Const">&quot;circle&quot;</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> string_of_shape : shape <span class="Stat">-&gt;</span> <span class="Type">string</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
++# string_of_shape <span class="Const">Square</span> <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;square&quot;</span>
+ </pre>
+ 
+-  <div>
+-    OCaml values seen from on the C side, can be divised in two cathegories,
+-    longs and blocks. Booleans, characters, integers, and in the present case
+-    scalar variants are represented as a C long. Other types are blocks.
+-    It is possible to test from which cathegory belongs a value with these macros:
+-  </div>
+-<pre>
+-  Is_long(v)
+-  Is_block(v)
+-</pre>
+-  <div>
+-    So you can use these to test if a variant is a scalar, or if it has parameters.
+-  </div>
+ 
+-<pre>
+-CAMLprim value
+-param_variant( value v )
+-{
+-    if (Is_long(v))
+-    {
+-        switch (Int_val(v))
+-        {
+-            case 0: printf("P0_a\n"); break;
+-            case 1: printf("P0_b\n"); break;
+-            default: caml_failwith("variant handling bug");
+-        }
+-    }
+-    else // (Is_block(v))
+-    {
+-        switch (Tag_val(v))
+-        {
+-        case 0: printf("P1_a(%d)\n",     Int_val(Field(v,0)) ); break;
+-        case 1: printf("P2_a(%d, %d)\n", Int_val(Field(v,0)), Int_val(Field(v,1)) ); break;
+-        case 2: printf("P1_b(%d)\n",     Int_val(Field(v,0)) ); break;
+-        case 3: printf("P2_b(%d, %d)\n", Int_val(Field(v,0)), Int_val(Field(v,1)) ); break;
+-        default: caml_failwith("variant handling bug");
+-        }
+-    }
+-    return Val_unit;
+-}
+-</pre>
++  <h2 id="def_variant2">Les Variants avec arguments</h2>
+ 
+   <div>
+-    Here you can notice that the constructor of variants with arguments can
+-    be handled with the macro <code>Tag_val(v)</code>. Also be careful with
+-    the numbers to switch on, scalars and blocks are numbered separately as
+-    you can see in this example.
++    Les variants peuvent &eacute;galement &ecirc;tre suivits d'arguments&nbsp;:
+   </div>
+ 
++<!--
++(* Définition du type shape avec un variant pour représenter différentes formes géométriques *)
++type shape =
++  | Square of float  (* Carré avec un côté *)
++  | Triangle of float * float  (* Triangle avec une largeur et une hauteur *)
++  | Circle of float  (* Cercle avec un rayon *)
++
++(* Exemples de formes géométriques *)
++let square = Square 5.0
++let triangle = Triangle (4.0, 6.0)
++let circle = Circle 3.0
++-->
+ <pre>
+-#load "funs.cma" ;;
+-open Funs ;;
++<span class="Comm">(* Définition du type shape avec un variant pour représenter différentes formes géométriques *)</span>
++<span class="Stat">type</span> shape <span class="Stat">=</span>
++  <span class="Stat">|</span> <span class="Const">Square</span> <span class="Stat">of</span> <span class="Type">float</span>            <span class="Comm">(* carré avec un côté *)</span>
++  <span class="Stat">|</span> <span class="Const">Triangle</span> <span class="Stat">of</span> <span class="Type">float</span> * <span class="Type">float</span>  <span class="Comm">(* triangle avec une largeur et une hauteur *)</span>
++  <span class="Stat">|</span> <span class="Const">Circle</span> <span class="Stat">of</span> <span class="Type">float</span>            <span class="Comm">(* cercle avec un rayon *)</span>
+ 
+-let () =
+-  handle_pvar (P0_a);
+-  handle_pvar (P0_b);
+-  handle_pvar (P1_a(21));
+-  handle_pvar (P1_b(27));
+-  handle_pvar (P2_a(30, 34));
+-  handle_pvar (P2_b(70, 74));
+-;;
++<span class="Comm">(* Exemples de formes géométriques *)</span>
++<span class="Stat">let</span> square <span class="Stat">=</span> <span class="Const">Square</span> <span class="Const">5.0</span>
++<span class="Stat">let</span> triangle <span class="Stat">=</span> <span class="Const">Triangle</span> <span class="Stat">(</span><span class="Const">4.0</span>, <span class="Const">6.0</span><span class="Stat">)</span>
++<span class="Stat">let</span> circle <span class="Stat">=</span> <span class="Const">Circle</span> <span class="Const">3.0</span>
+ </pre>
+ 
+ 
+-  <!-- ========================================================= -->
+-
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_option"><span>The type 'a option</span></h3>
+ 
+-  <div>
+-    The type <code>'a option</code> is defined like this in the ocaml
+-    standard library:
+-  </div>
+-
+-<pre>
+-type 'a option =
+-  | None
+-  | Some of 'a
+-</pre>
++  <h2 id="def_warnarr">Mise en garde contre les tableaux</h2>
+ 
+   <div>
+-    This is a variant with one argument (as seen in the previous section).<br />
+-    Here is for reference the code I'm using to return a value from C
+-    to the OCaml side, wrapped inside a <code>Some</code> constructor:
++    Attention les tableaux contrairement aux listes sont des structures
++    de type imp&eacute;rative dont les &eacute;l&eacute;ments sont
++    modifi&eacute;s en place, et donc avec ce que l'on appel des effets de bord.
++    Si une fonction en modifie un &eacute;l&eacute;ment, cette modification
++    prendra effet transversalement, comme le montre cet exemple&nbsp;:
+   </div>
+ 
+-<pre>
+-#define Val_none Val_int(0)
+-
+-static value
+-Val_some( value v )
+-{   
+-    CAMLparam1( v );
+-    CAMLlocal1( some );
+-    some = caml_alloc(1, 0);
+-    Store_field( some, 0, v );
+-    CAMLreturn( some );
+-}
+-</pre>
++<!--
++# let arr = [| 1; 2; 3; 4; 5 |] ;;
++val arr : int array = [|1; 2; 3; 4; 5|]
+ 
+-  <div>
+-    and an example function to test it:
+-  </div>
++# let modif i v =
++    arr.(i) <- v;
++  ;;
++val modif : int -> int -> unit = <fun>
+ 
+-<pre>
+-CAMLprim value
+-rand_int_option( value unit )
+-{
+-    int d = random() % 4;
+-    if (d)
+-      return Val_some( Val_int(d) );
+-    else
+-      return Val_none;
+-}
+-</pre>
++# modif 2 1024 ;;
++- : unit = ()
+ 
+-<pre>
+-external rand_int: unit -&gt; int option = "rand_int_option"
+-</pre>
++# arr ;;
++- : int array = [|1; 2; 1024; 4; 5|]
++-->
+ 
+ <pre>
+-# Array.init 10 (fun _ -&gt; rand_int()) ;;
+-[|Some 3; None; Some 1; None; Some 3; Some 3; Some 2; None; None; Some 3|]
+-</pre>
++<span class="PreProc">#</span> <span class="Stat">let</span> arr <span class="Stat">=</span> <span class="Stat">[|</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span> <span class="Stat">|]</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> arr : <span class="Type">int</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">|]</span>
+ 
+-  <div>
+-    and in the opposite way:
+-  </div>
++<span class="PreProc">#</span> <span class="Stat">let</span> modif i v <span class="Stat">=</span>
++    arr.<span class="Stat">(</span>i<span class="Stat">)</span> <span class="Stat">&lt;-</span> v<span class="Stat">;</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> modif : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+-<pre>
+-external say: string option -&gt; unit = "maybe_say"
+-</pre>
+-<pre>
+-#define Some_val(v) Field(v,0)
++<span class="PreProc">#</span> modif <span class="Const">2</span> <span class="Const">1024</span> <span class="Stat">;;</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ 
+-CAMLprim value
+-maybe_say( value speech )
+-{
+-    if (speech == Val_none)
+-        printf("Nothing\n");
+-    else
+-        printf("Something: %s\n", String_val(Some_val(speech)) );
+-    return Val_unit;
+-}
++<span class="PreProc">#</span> arr <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">1024</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">|]</span>
+ </pre>
+ 
+-<pre>
+-# say None ;;
+-Nothing
+-- : unit = ()
+-
+-# say (Some "Camelus bactrianus") ;;
+-Something: Camelus bactrianus
+-- : unit = ()
+-</pre>
+ 
+   <div>
+-    Now recent versions of OCaml provide these macros in the header of the FFI API
+-    (since version 4.12.0).<br />
+-    <code>#define Some_val(v) Field(v, 0)</code> is now defined in <code>&lt;caml/mlvalues.h&gt;</code>.<br />
+-    And these headers can now be found with an ocaml installed with opam in
+-    <code>~/.opam/4.12.0/lib/ocaml/caml</code>.<br />
++    Ainsi si une fonction modifie un tableau avant de s'en servir pour
++    quelqu'usage que ce soit, celui-ci ne sera pas intact apr&egrave;s l'appel
++    &agrave; cette fonction. Il faut y penser et y &ecirc;tre attentif pour en
++    tenir compte.
+   </div>
+ 
+   <div>
+-    If you want to keep some backward compatibility, you can put these macro inside a cpp if
+-    which checks the ocaml version:
++    Ce type de probl&egrave;me n'existe pas avec les listes qui sont des structures
++    de type fonctionnel.
++    (sauf si la liste contient des &eacute;l&eacute;ments modifiables/mutable)
+   </div>
+ 
+-<pre>
+-#if OCAML_VERSION &lt; 41200
+-
+-#define Val_none Val_int(0)
+-#define Some_val(v) Field(v,0)
+-
+-static value
+-Val_some(value v)
+-{
+-    CAMLparam1(v);
+-    CAMLlocal1(some);
+-    some = caml_alloc(1, 0);
+-    Store_field(some, 0, v);
+-    CAMLreturn(some);
+-}
+-#else
+-
+-#define Val_some caml_alloc_some
+-
+-#endif
+-</pre>
+-
+   <div>
+-    In the header file <code>"caml/mlvalues.h"</code>
+-    of ocaml version <code>4.11.1</code>, there are these defines:
++    Ainsi si une fonction a besoin d'utiliser une version modifi&eacute;e
++    d'un tableau ou d'une cha&icirc;ne de caract&egrave;re et que le programme
++    en cours aura encore besoin de leur version originale apr&egrave;s l'appel
++    de fonction en question, vous pouvez utiliser une copie locale &agrave;
++    la place de l'originale avec les fonctions
++    <code><span class="Mod">Array</span>.copy</code> ou
++    <code><span class="Mod">Bytes</span>.copy</code>.
+   </div>
+ 
+-<pre>
+-#define Is_block(x)  (((x) &amp; 1) == 0)
+-#define Is_long(x)   (((x) &amp; 1) != 0)
+-</pre>
+ 
+-  <div>
+-    So we may define <code>Is_Some()</code> and <code>Is_None()</code>
+-    macros like:
+-  </div>
+ 
+-<pre>
+-#define Is_Some(x)  (((x) &amp; 1) != 1)
+-#define Is_None(x)  (((x) &amp; 1) == 1)
+-</pre>
++  <h2 id="def_strings">Les cha&icirc;nes de caract&egrave;res</h2>
++
+ 
+   <div>
+-    Now, since <code>4.12.0</code> there are the macros behind defined in
+-    <code>"caml/mlvalues.h"</code>:
++    Le m&ecirc;me type d'effet de bord pouvaient avoir lieu avec les cha&icirc;nes de
++    caract&egrave;res avant ocaml version 4.06&nbsp;:
+   </div>
+-<pre>
+-/* Option constructors */
+ 
+-#define Val_none Val_int(0)
+-#define Some_val(v) Field(v, 0)
+-#define Tag_some 0
+-#define Is_none(v) ((v) == Val_none)
+-#define Is_some(v) Is_block(v)
+-
+-</pre>
++<!--
++# let str = "OCaml" ;;
++val str : string = "OCaml"
+ 
++# let modif str i c =
++    str.[i] <- c;
++  ;;
++val modif : string -> int -> char -> unit = <fun>
+ 
++# modif str 1 'k' ;;
++- : unit = ()
+ 
+-  <!-- ========================================================= -->
++# str ;;
++- : string = "Okaml"
++-->
+ 
+-  <hr />
++<pre>
++<span class="PreProc">#</span> <span class="Stat">let</span> str <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> str : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+ 
+-  <h3 id="ref_optlabel"><span>Optional labeled parameter</span></h3>
++<span class="PreProc">#</span> <span class="Stat">let</span> modif str i c <span class="Stat">=</span>
++    str.<span class="Stat">[</span>i<span class="Stat">]</span> <span class="Stat">&lt;-</span> c<span class="Stat">;</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> modif : <span class="Type">string</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">char</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+-  <div>
+-    In a very close way, you can put optional parameters using labels:
+-  </div>
++<span class="PreProc">#</span> modif str <span class="Const">1</span> <span class="Const">'k'</span> <span class="Stat">;;</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ 
+-<pre>
+-external say_lbl: ?speech:string -&gt; unit -&gt; unit = "maybe_say_label"
++<span class="PreProc">#</span> str <span class="Stat">;;</span>
++- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;Okaml&quot;</span>
+ </pre>
+ 
+   <div>
+-    Note that here the type is <code>string</code> and not
+-    <code>string option</code>,
+-    and that from the C side it is seen as a <code>string option</code>.
++    Jusqu'à la version 4.01, les cha&icirc;nes de caract&egrave;res
++    &eacute;taient modifiables.
++    <br />
++    Un nouveau type <code><span class="Stat">bytes</span></code> fut introduit dans ocaml version 4.02, et
++    la période de transition fut étalée à partir de la version 4.02, et
++    jusqu'à la version 4.14.
++    <br />
++    A partir de la version 4.06 d'ocaml, les cha&icirc;nes de caract&egrave;res
++    sont devenues non-modifiables, par d&eacute;faut.
++    <br />
++    A partir de la version 5.00, les cha&icirc;nes de caract&egrave;res
++    sont uniquement non-modifiables
++    (plus de mode de compatibilit&eacute;).
+   </div>
+ 
+ <pre>
+-CAMLprim value
+-maybe_say_label( value speech, value unit )
+-{
+-    if (speech == Val_none)
+-        printf("Nothing\n");
+-    else
+-        printf("Something: %s\n", String_val(Some_val(speech)) );
+-    return Val_unit;
+-}
++<span class="PreProc">#</span> <span class="Stat">let</span> s <span class="Stat">=</span> <span class="Mod">Bytes</span>.of_string <span class="Const">&quot;Hello&quot;</span> <span class="Stat">;;</span>
++<span class="Stat">val</span> s : <span class="Type">bytes</span> <span class="Stat">=</span> <span class="Mod">Bytes</span>.of_string <span class="Const">&quot;Hello&quot;</span>
++
++<span class="PreProc">#</span> <span class="Mod">Bytes</span>.set s <span class="Const">4</span> <span class="Const">'a'</span> <span class="Stat">;;</span>
++- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
++
++<span class="PreProc">#</span> s <span class="Stat">;;</span>
++- : <span class="Type">bytes</span> <span class="Stat">=</span> <span class="Mod">Bytes</span>.of_string <span class="Const">&quot;Hella&quot;</span>
+ </pre>
+ 
+-  <div>
+-    You will then often need to add a unit parameter at the end of the parameters
+-    list, which also need to be added in the C function even if it is not used.
+-  </div>
++<!--
++# let s = Bytes.of_string "Hello" ;;
++val s : bytes = Bytes.of_string "Hello"
+ 
+-<pre>
+-# say_lbl () ;;
+-Nothing
++# Bytes.set s 4 'a' ;;
+ - : unit = ()
+ 
+-# say_lbl ~speech:"le chameau songeur" () ;;
+-Something: le chameau songeur
+-- : unit = ()
+-</pre>
++# s ;;
++- : bytes = Bytes.of_string "Hella"
+ 
++-->
+ 
+-  <!-- ========================================================= -->
+ 
+   <hr />
++  <!-- ======================================================== -->
+ 
+-  <h3 id="ref_plmvrnt"><span>Polymorphic Variants</span></h3>
++  <h3 id="def_tailrec">R&eacute;cursivit&eacute; Terminale</h3>
+ 
+-<pre>
+-type plm_var = [
+-  | `plm_A
+-  | `plm_B
+-  | `plm_C
+-  ]
+-
+-external plm_variant: plm_var -&gt; unit = "polymorphic_variant"
+-</pre>
+ 
+   <div>
+-    The C representation of a polymorphic variant can by retrieved
+-    with a function that computes its hash value:
++    La r&eacute;cursivit&eacute; terminale est une notion tr&egrave;s importante
++    &agrave; ma&icirc;triser en OCaml,
++    car de sa ma&icirc;trise d&eacute;pend la
++    <a href="http://fr.wiktionary.org/wiki/scalabilit&eacute;"
++    >scalabilit&eacute;</a>
++    de vos programmes.
+   </div>
+ 
+-<pre>
+-CAMLprim value
+-polymorphic_variant( value v )
+-{
+-    if (v == caml_hash_variant("plm_A"))  puts("polymorphic variant A");
+-    if (v == caml_hash_variant("plm_B"))  puts("polymorphic variant B");
+-    if (v == caml_hash_variant("plm_C"))  puts("polymorphic variant C");
+-    return Val_unit;
+-}
+-</pre>
+-
+-<pre>
+-let () =
+-  plm_variant `plm_A;
+-  plm_variant `plm_B;
+-  plm_variant `plm_C;
+-;;
+-</pre>
+-
+   <div>
+-    If performance is an issue, instead of make a call to
+-    <code>caml_hash_variant()</code>
+-    each time, what you can do is to get its result for each variant, and create
+-    constants which you use in a switch:
++    Voici un exemple de fonction r&eacute;cursive qui calcule la somme d'une
++    suite d'entier de 1 jusqu'&agrave; un nombre donn&eacute;&nbsp;:
+   </div>
+ 
+ <pre>
+-#include &lt;caml/mlvalues.h&gt;
+-#include &lt;stdio.h&gt;
+-
+-int main()
+-{
+-    printf("#define  MLVAR_plm_A  (%d)\n", caml_hash_variant("plm_A") );
+-    printf("#define  MLVAR_plm_B  (%d)\n", caml_hash_variant("plm_B") );
+-    printf("#define  MLVAR_plm_C  (%d)\n", caml_hash_variant("plm_C") );
+-    return 0;
+-}
++<span class="PreProc">#</span> <span class="Stat">let</span> <span class="Stat">rec</span> add x <span class="Stat">=</span>
++    <span class="Stat">if</span> x <span class="Stat">&lt;</span><span class="Stat">=</span> <span class="Const">0</span>
++    <span class="Stat">then</span> <span class="Const">0</span>
++    <span class="Stat">else</span> x + add <span class="Stat">(</span>x - <span class="Const">1</span><span class="Stat">)</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> add : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ </pre>
+ 
+   <div>
+-    Which you can compile with:
++    &Agrave; priori, cette fonction para&icirc;t correcte, sauf que pour des valeurs &eacute;lev&eacute;es
++    il risque d'y avoir une surcharge qui emp&egrave;chera &agrave; cette fonction
++    de renvoyer le r&eacute;sultat.
+   </div>
+ 
+ <pre>
+-&gt; empty.ml
+-ocamlc -o empty.o -output-obj empty.ml
+-ocamlc -c variant.c
+-gcc -o variant.exe variant.o empty.o -L"`ocamlc -where`" -lcamlrun -lm -lcurses
+-</pre>
++<span class="PreProc">#</span>  add <span class="Const">10</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">55</span>
+ 
+-  <div>
+-    <code>./variant.exe</code> will output this result:
+-  </div>
++<span class="PreProc">#</span> add <span class="Const">100</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5050</span>
+ 
+-<pre>
+-#define  MLVAR_plm_A   (-1993467801)
+-#define  MLVAR_plm_B   (-1993467799)
+-#define  MLVAR_plm_C   (-1993467797)
++<span class="PreProc">#</span> add <span class="Const">10_000</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">50005000</span>
++
++<span class="PreProc">#</span> add <span class="Const">100_000</span> <span class="Stat">;;</span>
++<span class="Alert">Stack overflow during evaluation (looping recursion?).</span>
+ </pre>
+ 
+   <div>
+-    Which you can then include at the beginning of your C code,
+-    then you can replace the previous function <code>polymorphic_variant()</code> by:
++    Voici ce qui se passe, &agrave; la derni&egrave;re ligne de la fonction,
++    &agrave; la suite du else, il y a une addition avec le r&eacute;sultat
++    d'un appel de fonction, donc le calcul ne peut &ecirc;tre r&eacute;alis&eacute;
++    aussit&ocirc;t car il faut d'abord calculer le r&eacute;sultat de cette
++    fonction, le calcul est donc laiss&eacute; en suspend en attendant.
++    Or il y aura autant de calcul laiss&eacute;s en suspend que d'appel total
++    &agrave; la fonction, ce nombre correspondant ici &agrave; la valeur du
++    param&egrave;tre.<br />
++    Donc pour cent mille, il y aurra cent mille appels successifs &agrave; la
++    fonction et donc cent mille calculs laiss&eacute;s en instance&nbsp;!<br />
++    La pile d'appel des fonctions (stack) est alors surcharg&eacute;e (overflow).
++    <br />
++    C'est un peu comme une personne qui aurait du travail &agrave; faire et qui
++    chaque jour le remettrait au lendemain, et &agrave; la fin il se retrouverait
++    incapable de r&eacute;aliser tout le travail accumul&eacute;.
+   </div>
+ 
+-<pre>
+-CAMLprim value
+-polymorphic_variant( value v )
+-{
+-    switch (v)
+-    {
+-        case MLVAR_plm_A:  puts("polymorphic variant A");  break;
+-        case MLVAR_plm_C:  puts("polymorphic variant B");  break;
+-        case MLVAR_plm_D:  puts("polymorphic variant C");  break;
+-        default:
+-            caml_failwith("unrecognised polymorphic variant");
+-    }
+-    return Val_unit;
+-}
+-</pre>
+-
+-  <hr />
+-
+-
+   <div>
+-    And another way to get the same defines:
++    La solution est donc de r&eacute;aliser le calcul &agrave; faire &agrave;
++    chaque &eacute;tape et de passer le r&eacute;sultat &agrave; la boucle
++    suivante.<br />
++    Il faut donc r&eacute;aliser une fonction auxiliaire <code>'aux'</code>
++    avec un param&egrave;tre additionnel <code>'acc'</code>
++    o&ugrave; le r&eacute;sultat final s'accumule &agrave; chaque boucle&nbsp;:
+   </div>
+ 
+ <pre>
+-CAMLprim value
+-print_polymorphic_variant_val( value v )
+-{
+-    printf("%d", (long) v );
+-    fflush(stdout);
+-    return Val_unit;
+-}
+-</pre>
+-<pre>
+-external pmvar_print_i: pmvar -&gt; unit = "print_polymorphic_variant_val"
++<span class="PreProc">#</span> <span class="Stat">let</span> addt x <span class="Stat">=</span>
++    <span class="Stat">let</span> <span class="Stat">rec</span> aux x acc <span class="Stat">=</span>
++      <span class="Stat">if</span> x <span class="Stat">&lt;=</span> <span class="Const">0</span>
++      <span class="Stat">then</span> acc
++      <span class="Stat">else</span> aux <span class="Stat">(</span>x - <span class="Const">1</span><span class="Stat">)</span> <span class="Stat">(</span>x + acc<span class="Stat">)</span>
++    <span class="Stat">in</span>
++    aux x <span class="Const">0</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> addt : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+-let () =
+-  let p = Printf.printf in
+-  p "#define  MLVAR_plm_A \t %!";  (pmvar_print_i `plm_A);  p "\n%!";
+-  p "#define  MLVAR_plm_B \t %!";  (pmvar_print_i `plm_B);  p "\n%!";
+-  p "#define  MLVAR_plm_C \t %!";  (pmvar_print_i `plm_C);  p "\n%!";
+-;;
++<span class="PreProc">#</span> addt <span class="Const">100_000</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5000050000</span>
+ </pre>
+ 
+   <div>
+-    Notice the flush of the stdout channels on the two sides after each
+-    strings (in OCaml flush is achieved by <code>"%!"</code>),
+-    this is because the stdout of OCaml and C are two different channels that
+-    are not synchronised.
++    La nouvelle fonction est alors dite "r&eacute;cursive terminale", car
++    dans la r&eacute;cursivit&eacute; le r&eacute;sultat est donn&eacute; en
++    position terminale,
++    ici au niveau du <code>'then'</code>,
++    alors qu'avant c'&eacute;tait le bout de la cha&icirc;ne le r&eacute;sultat
++    &eacute;tant situ&eacute;
++    au niveau de l'addition (lors de la derni&egrave;re boucle).<br />
++    Dans la premi&egrave;re version de la fonction, le then renvoyait un 0,
++    c'est donc avec cette valeur que la variable acc est initialis&eacute;e
++    lors de l'appel &agrave; la fonction auxiliaire aux.
+   </div>
+ 
+ 
+-
+-  <!-- ========================================================= -->
+-
+   <hr />
++  <!-- ======================================================== -->
+ 
+-  <h3 id="ref_linklib"><span>Linking against a library</span></h3>
+ 
+   <div>
+-    Now imagine that you want to use a C library in the C part,
+-    let's say a fictitious library called "MyLib", which is compiled
+-    in C programs this way:<br />
+-    <code>cc -o my_prog -L/lib/path -lMyLib my_prog.c </code><br />
+-    In this case the argument <code>-lMyLib</code> will have to be
+-    inserted while compiling the module, as shown below:
++    Voici un autre exemple de fonction r&eacute;cursive non terminale.
++    Cette fonction produit une liste d'entiers entre deux entiers donn&eacute;s&nbsp;:
+   </div>
+ 
+-<pre>
+-dllwrap_stubs.so: wrap.o
+-        ocamlmklib  -o  wrap_stubs  $&lt;  \
+-            -L/lib/path  -lMyLib
+ 
+-funs.cmxa:  funs.cmx  dllwrap_stubs.so
+-        ocamlopt -a  -o $@  $&lt;  -cclib -lwrap_stubs \
+-            -ccopt -L/lib/path  \
+-            -cclib -lMyLib
++<pre>
++<span class="PreProc">#</span> <span class="Stat">let</span> <span class="Stat">rec</span> up_to m n <span class="Stat">=</span>
++    <span class="Stat">if</span> m <span class="Stat">&gt;</span> n
++      <span class="Stat">then</span> up_to n m
++      <span class="Stat">else</span> <span class="Stat">if</span> m <span class="Stat">=</span> n
++        <span class="Stat">then</span> <span class="Stat">[</span>m<span class="Stat">]</span>
++        <span class="Stat">else</span> m <span class="Stat">::</span> up_to <span class="Stat">(</span>m+<span class="Const">1</span><span class="Stat">)</span> n
++    <span class="Stat">;;</span>
++<span class="Stat">val</span> up_to : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+-funs.cma:  funs.cmo  dllwrap_stubs.so
+-        ocamlc -a  -o $@  $&lt;  -dllib -lwrap_stubs \
+-            -ccopt -L/lib/path  \
+-            -cclib -lMyLib
++<span class="PreProc">#</span> up_to <span class="Const">4</span> <span class="Const">12</span><span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">6</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">9</span><span class="Stat">;</span> <span class="Const">10</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">]</span>
+ </pre>
+ 
+-  <div>
+-    For the native code module, the directives have to be preceded
+-    by <code>-cclib</code> for the linker, and <code>-ccopt</code> for
+-    the compiler and linker.<br />
+-    Note the use of <code>-dllib</code> for ocamlc.
+-  </div>
+ 
+   <div>
+-    Read the related manual pages for more informations:
+-
+-    <span class="for_screen">
+-      <a href="https://v2.ocaml.org/releases/4.14/htmlman/comp.html"
+-      >ocamlc</a>,
+-    </span>
+-
+-    <span class="for_print">
+-      <br />the page about <strong>ocamlc</strong>
+-      <a href="#"
+-      >https://v2.ocaml.org/releases/4.14/htmlman/comp.html</a>
+-      in <strong>Chapter 11</strong>, and<br />
+-    </span>
+-
+-
+-    <span class="for_screen">
+-      <a href="https://v2.ocaml.org/releases/4.14/htmlman/native.html"
+-      >ocamlopt</a>.
+-    </span>
+-
+-    <span class="for_print">
+-      the page about <strong>ocamlopt</strong>
+-      <a href="#"
+-      >https://v2.ocaml.org/releases/4.14/htmlman/native.html</a>
+-      in <strong>Chapter 14</strong>.
+-    </span>
+-
+-
++    Et voici la version r&eacute;cursive terminale&nbsp;:
+   </div>
+ 
+ 
+-<!--
+ <pre>
+-doc: funs.mli
+-        if [ ! -d doc ]; then mkdir doc ; fi
+-        ocamldoc -html -colorize-code -d doc $&lt;
+-
+-clean:
+-        rm -f *.[oa] *.so *.cm[ixoa] *.cmxa *~ doc/*.{html,css}
+-
+-# install 
+-
+-PREFIX = "`ocamlc -where`/funs"
+-
+-DIST_FILES=\
+-    funs.a         \
+-    funs.cmi       \
+-    funs.cma       \
+-    funs.cmxa      \
+-    libwrap_stubs.a
++<span class="PreProc">#</span> <span class="Stat">let</span> up_to m n <span class="Stat">=</span>
++  <span class="Stat">let</span> <span class="Stat">rec</span> aux m n acc <span class="Stat">=</span>
++    <span class="Stat">if</span> m <span class="Stat">&gt;</span> n
++    <span class="Stat">then</span> acc
++    <span class="Stat">else</span> aux m <span class="Stat">(</span>n-<span class="Const">1</span><span class="Stat">)</span> <span class="Stat">(</span>n<span class="Stat">::</span>acc<span class="Stat">)</span>
++  <span class="Stat">in</span>
++  <span class="Stat">if</span> m <span class="Stat">&gt;</span> n
++  <span class="Stat">then</span> aux n m <span class="Const">[]</span>
++  <span class="Stat">else</span> aux m n <span class="Const">[]</span>
++  <span class="Stat">;;</span>
++<span class="Stat">val</span> up_to : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ 
+-SO_DIST_FILES=\
+-    dllwrap_stubs.so
+-
+-
+-install: $(DIST_FILES)  $(SO_DIST_FILES)
+-        if [ ! -d $(PREFIX) ]; then install -d $(PREFIX) ; fi
+-
+-        install -m 0755  \
+-                $(SO_DIST_FILES)  \
+-                $(PREFIX)/
+-
+-        install -m 0644        \
+-                $(DIST_FILES)  \
+-                $(PREFIX)/
++<span class="PreProc">#</span> up_to <span class="Const">4</span> <span class="Const">12</span> <span class="Stat">;;</span>
++- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">6</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">9</span><span class="Stat">;</span> <span class="Const">10</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">]</span>
+ </pre>
+--->
+-
+-
+-  <!-- ========================================================= -->
+-
+-  <hr />
+-
+-  <h3 id="ref_mlfromc"><span>Call Caml functions from C</span></h3>
+ 
+ 
+   <div>
+-    To call caml functions from C, you have to give a string that identifies
+-    each caml functions with  <code>Callback.register</code>.
+-    You can then retrieve this caml function from C with
+-    <code>caml_named_value("ID")</code>.
+-    And you can cache the call to <code>caml_named_value()</code>,
+-    as you can see in the C code below, with a <code>static</code> variable.
+-    But you still have to test if it is equal to <code>NULL</code> in case
+-    the caml garbage collector has freed it.
++    On peut v&eacute;rifier la capacit&eacute; de ces deux fonctions avec<br />
++    <code>ignore<span class="Stat">(</span>up_to <span class="Const">0 100000</span><span class="Stat">) ;;</span></code><br />
++    la version r&eacute;cursive terminale est effectivement plus performante.
+   </div>
+-<pre>
+-let print_hello () =
+-  print_endline "Hello World";
+-;;
+ 
+-let () =
+-  Callback.register "hello-callback" print_hello;
+-;;
+-</pre>
++  <div>
++    D'apr&egrave;s le manuel d'OCaml, il faut utiliser une version r&eacute;cursive terminale
++    d&egrave;s lors que le nombre d'&eacute;l&eacute;ments des listes &agrave; traiter peut d&eacute;passer les dix milles
++    (environ).
++  </div>
+ 
+-<pre>
+-#include &lt;caml/callback.h&gt;
+ 
+-void hello_closure()
+-{
+-    static const value * closure_f = NULL;
+-    if (closure_f == NULL) {
+-        closure_f = caml_named_value("hello-callback");
+-    }
+-    caml_callback(*closure_f, Val_unit);
+-}
+-</pre>
+ 
+ 
+-  <!-- ========================================================= -->
+-
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_bootfromc"><span>Start-up from C</span></h3>
++  <h2 id="def_script">Script et ex&eacute;cutables</h2>
+ 
+ 
+-  <div>
+-    If you want to make your main program from C, which will
+-    call caml parts, you can do it as below,
++  <div class="nb">
++    Apr&egrave;s avoir utilis&eacute; le top-level, maintenant voyons comment cr&eacute;er des scripts
++    et des ex&eacute;cutables. Pour cela ouvrez un nouveau fichier avec l'extension de fichier
++    <em>.ml</em> correspondant aux fichiers source OCaml, et &eacute;crivez une simple instruction,
++    comme par exemple&nbsp;:
+   </div>
+ 
+-  <div>
+-    file <code>"ml_part.ml"</code>:
+-  </div>
+ <pre>
+-let print_hello () =
+-  print_endline "Hello World";
+-;;
+-
+-let () =
+-  Callback.register "Hello callback" print_hello;
+-;;
++print_endline <span class="Const">&quot;Hello World!&quot;</span> <span class="Stat">;;</span>
+ </pre>
+ 
+-  <div>
+-    file <code>"main.c"</code>:
++  <div class="nb">
++    Pour ex&eacute;cuter ce fichier en tant que script, il suffit ensuite de lancer l'interpr&eacute;teur
++    en ligne de commande avec le script en argument comme ceci&nbsp;:
+   </div>
+-<pre>
+-#include &lt;caml/mlvalues.h&gt;
+-#include &lt;caml/callback.h&gt;
+-
+-void hello_closure()
+-{
+-    static value * closure_f = NULL;
+-    if (closure_f == NULL) {
+-        closure_f = caml_named_value("Hello callback");
+-    }
+-    caml_callback(*closure_f, Val_unit);
+-}
+ 
+-int main(int argc, char **argv)
+-{
+-    caml_main(argv);
+-    hello_closure();
+-    return 0;
+-}
+-</pre>
+-  <div>
+-    In the <code>main</code> function the first instruction have to be
+-    <code>caml_main(argv)</code> in order to init the caml part of the program.
+-    All the caml instructions at the root level (for exemple
+-    <code>print_endline&nbsp;"something"&nbsp;;;</code>, and everything defined under
+-    <code>let&nbsp;()&nbsp;=&nbsp;(*&nbsp;code&nbsp;*)&nbsp;;;</code>)
+-    will be evaluated and executed at this moment.
+-  </div>
+-
+-  <div>
+-    Compilation:
+-  </div>
+ <pre>
+-ocamlopt -output-obj ml_part.ml -o ml_part_obj.o
+-
+-gcc -c main.c  -I"`ocamlc -where`"
+-
+-gcc -o prog.opt  \
+-        main.o  ml_part_obj.o   \
+-        -L"`ocamlc -where`"     \
+-        -lm -ldl -lasmrun
++ocaml hello.ml
+ </pre>
+ 
+-  <div>
+-    The last line mentions the <code>-lm</code> and <code>-ldl</code> libraries,
+-    as can be found by:<br />
+-    <code>grep NATIVECCLIBS "`ocamlc -where`/Makefile.config"</code>
++  <div class="nb">
++    Si vous utilisez un syst&egrave;me de type Unix comme Linux, MacOS, Cygwin ou Chromebook, il vous est &eacute;galement
++    possible de pouvoir ex&eacute;cuter votre script comme un ex&eacute;cutable sans pr&eacute;ciser l'interpr&eacute;teur
++    sur la ligne de commande. Voici comment proc&eacute;der, premi&egrave;rement ajoutez &agrave; la premi&egrave;re
++    ligne du script le chemin de l'interpr&eacute;teur comme ceci&nbsp;:
+   </div>
+ 
+-  <div>
+-    So for portability issue with your Makefile,
+-    it is possible to replace the two arguments <code>-lm -ldl</code>
+-    by the variable <code>$(NATIVECCLIBS)</code>.
+-    To achieve this you just need to include the
+-    file <code>`ocamlc -where`/Makefile.config</code> as below:
++<pre>
++#!/usr/bin/env ocaml
++</pre>
++  <div class="nbnt">
++    ensuite rendez le ex&eacute;cutable en lui ajoutant les droits d'ex&eacute;cution&nbsp;:
+   </div>
+-
+ <pre>
+-OCAML_DIR = $(shell ocamlc -where)
+- -include  $(OCAML_DIR)/Makefile.config
+-
+-prog.opt: main.o  ml_part_obj.o
+-        gcc -o $@  $^   \
+-            -L"$(OCAML_DIR)"  \
+-            $(NATIVECCLIBS) -lasmrun
++chmod a+x hello.ml
+ </pre>
+-
+-  <div>
+-    If <code>argv</code> is not accessible in your code, you may
+-    eventually replace it like that:
++  <div class="nbnt">
++    vous pouvez alors ex&eacute;cuter directement votre script comme n'importe quel ex&eacute;cutable&nbsp;:
+   </div>
+ <pre>
+-  char *caml_argv[] = { NULL };
+-  caml_main(caml_argv);
++./hello.ml
+ </pre>
+ 
+   <div>
+-    The related sections in the OCaml manual are here:
++    Et pour ce qui est de cr&eacute;er des ex&eacute;cutables pour de meilleures performences,
++    vous pouvez compiler votre fichier source au choix en code natif ou en byte-code.
++    La compilation en byte-code a pour avantage que l'ex&eacute;cutable pourra &ecirc;tre
++    ex&eacute;cut&eacute; ind&eacute;pendament sur n'importe quel syst&egrave;me d'exploitation o&ugrave; la machine virtuelle
++    OCaml est install&eacute;e. La machine virtuelle est un interpr&eacute;teur qui interpr&egrave;te
++    le code binaire dans lequel a &eacute;t&eacute; compil&eacute; le fichier source.
+     <br />
+-
+-    <span class="for_screen">
+-      <a href="https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#ss:main-c"
+-      >20.7.4 &nbsp;Main program in C</a>, and
+-      <br />
+-      <a href="https://v2.ocaml.org/releases/4.14/htmlman/intfc.html#ss:c-embedded-code"
+-      >20.7.5 &nbsp;Embedding the OCaml code in the C code</a>.
+-    </span>
+-
+-    <span class="for_print">
+-      sections <strong>20.7.4 &nbsp;Main program in C</strong>, and
+-      <strong>20.7.5 &nbsp;Embedding the OCaml code in the C code</strong>
+-      at <em>Chapter 20</em> page<br />
+-      <a href="#"
+-      >https://v2.ocaml.org/releases/4.14/htmlman/intfc.html</a>
+-    </span>
+-
++    La compilation en code natif a elle pour avantage des performences optimums
++    (comparable &agrave; du C ou du C++).
+   </div>
+ 
++  <div class="nb">
++    Ainsi pour compiler en byte-code, utilisez le compilateur correspondant&nbsp;:
++  </div>
+ 
+-
+-  <hr style="margin-top:2.4em;" />
+-
+-  <h3 id="ref_cplusplus"><span>Mixing with C++</span></h3>
+-
+-
+-  <div>Contents of file <strong>mymod_stubs.cc</strong>:</div>
+ <pre>
+-#include &lt;iostream&gt;
+-#include &lt;string&gt;
+-
+-extern "C" {
+-#include &lt;caml/memory.h&gt;
+-#include &lt;caml/mlvalues.h&gt;
+-}
+-
+-extern "C" value my_hello_cc (value v_str) {
+-  CAMLparam1 (v_str);
+-
+-  std::cout &lt;&lt; "Hello " &lt;&lt; String_val(v_str) &lt;&lt; "!\n";
+-
+-  CAMLreturn (Val_unit);
+-}
++ocamlc  hello.ml  -o hello.byte
++./hello.byte
+ </pre>
+ 
+-  <div>Contents of file <strong>mymod.ml</strong>:</div>
++  <div class="nb">
++    Et de m&ecirc;me pour compiler un ex&eacute;cutable en code natif&nbsp;:
++  </div>
++
+ <pre>
+-external my_hello: string -&gt; unit = "my_hello_cc"
++ocamlopt  hello.ml  -o hello
++./hello
+ </pre>
+ 
+-  <div>Contents of file <strong>caller.ml</strong>:</div>
++  <div class="nb">
++    Idem pour les utilisateurs de Windows n&eacute;cessitant une extention de fichier&nbsp;:
++  </div>
++
+ <pre>
+-let _ =
+-  Mymod.my_hello "Blue Camel";
+-;;
++ocamlopt  hello.ml  -o hello.exe
++./hello.exe
+ </pre>
+ 
+-  <div>compile to native code with:</div>
+-<pre>
+-g++ -o mymod_stubs.o -I`ocamlc -where` -c mymod_stubs.cc
+-ocamlopt -c mymod.ml
+-ocamlmklib -o mymod mymod_stubs.o
+-ocamlmklib -o mymod mymod.cmx
+ 
+-ocamlopt -I . -cclib -lstdc++ mymod.cmxa caller.ml -o caller.opt
+-</pre>
++  <!-- ======================================================== -->
++  <hr />
+ 
+-  <div>then call it:</div>
+-<pre>
+-% ./caller.opt 
+-Hello Blue Camel!
+-</pre>
++  <h2 id="def_main">Main</h2>
+ 
++  <h4>Point d'entrée du programme</h4>
+ 
+-  <div>now the compilation for bytecode:</div>
+-<pre>
+-g++ -o mymod_stubs.o -I`ocamlc -where` -c mymod_stubs.cc
+-ocamlc -c mymod.ml
+-ocamlmklib -o mymod -lstdc++ mymod_stubs.o
+-ocamlmklib -o mymod  mymod.cmo
++  <div>
++    Pour organiser les &eacute;l&eacute;ments dans un script ou un programme ocaml,
++    il est recommand&eacute; de proc&eacute;der comme suit.
++    Placer l'ensemble des fonctions au d&eacute;but du programme, suivit &agrave;
++    la fin du point d'entr&eacute;e, o&ugrave; l'ex&eacute;cution du programme commencera.
++    (si une fonction est d&eacute;finie mais sans être appel&eacute;e, elle ne
++    r&eacute;alisera rien).
++  </div>
+ 
+-ocamlc -I . mymod.cma  caller.ml  -o caller.byte
+-</pre>
++  <div>
++    En C, le point d'entrée est la fonction 'main', en ocaml on place
++    un 'let' suivit d'un 'unit', comme dans cet exemple&nbsp;:
++  </div>
+ 
+-  <div>then call it:</div>
+-<!--
+-% ./caller.byte
+-Fatal error: cannot load shared library dllfoo
+-Reason: dllfoo.so: cannot open shared object file: No such file or directory
+--->
+-<!-- If you know how to resolve this path problem please send me an email -->
+ <pre>
+-% ocaml mymod.cma caller.ml
+-Hello Blue Camel!
++<span class="Stat">let</span> fib n <span class="Stat">=</span>
++  <span class="Stat">let</span> <span class="Stat">rec</span> aux a b acc <span class="Stat">=</span>
++    <span class="Stat">if</span> a &gt; n <span class="Stat">then</span> <span class="Stat">(</span><span class="Mod">List</span>.rev acc<span class="Stat">)</span>
++    <span class="Stat">else</span> aux b <span class="Stat">(</span>a+b<span class="Stat">)</span> <span class="Stat">(</span>a::acc<span class="Stat">)</span>
++  <span class="Stat">in</span>
++  aux <span class="Const">0</span> <span class="Const">1</span> <span class="Const">[]</span>
+ 
+-% ocamlrun -I . caller.byte
+-Hello Blue Camel!
++<span class="Stat">let</span> <span class="Const">()</span> <span class="Stat">=</span>
++  <span class="Stat">let</span> n <span class="Stat">=</span> int_of_string <span class="Mod">Sys</span>.argv.<span class="Stat">(</span><span class="Const">1</span><span class="Stat">)</span> <span class="Stat">in</span>
++  <span class="Stat">let</span> li <span class="Stat">=</span> fib n <span class="Stat">in</span>
++  <span class="Stat">let</span> s <span class="Stat">=</span> <span class="Mod">String</span>.concat <span class="Const">&quot; &quot;</span> <span class="Stat">(</span><span class="Mod">List</span>.map string_of_int li<span class="Stat">)</span> <span class="Stat">in</span>
++  print_endline s<span class="Stat">;</span>
++<span class="Stat">;;</span>
+ </pre>
+ 
+-
+   <div>
+-    This section about C++ was greatly inspired by the tutorial by
+-    <em>Anne Pacalet</em>
+-    (in French) which you can find
+-
+-    <span class="for_screen">
+-      <a href="http://anne-pacalet.developpez.com/tutoriels/ocaml/interface-c-ou-cpp-et-ocaml/"
+-      >here</a> or
+-      <a href="http://www-sop.inria.fr/everest/personnel/Anne.Pacalet/camltop.php"
+-      >there</a>.
+-    </span>
+-
+-    <span class="for_print">
+-      on one of these web page:
+-      <br /><a href="#"
+->http://anne-pacalet.developpez.com/tutoriels/ocaml/interface-c-ou-cpp-et-ocaml/</a>
+-      <br /><a href="#"
+->http://www-sop.inria.fr/everest/personnel/Anne.Pacalet/camltop.php</a>
+-    </span>
++    Ce petit programme affiche la suite de Fibonacci, jusqu'&agrave; un certain nombre
++    pass&eacute; en param&egrave;tre au programme par la ligne de commande&nbsp;:
+   </div>
+ 
++<pre>
++$ ocaml fib.ml 1000
++ 0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
++</pre>
+ 
+-<!--
+-  <hr style="margin-top:2.4em;" />
+-
+-  <div id="ref_misc">
++  <div>
++    En biologie, la suite de Fibonacci se retrouve dans de nombreux ph&eacute;nom&egrave;nes
++    naturels, tels que la croissance des plantes, la structure des fleurs, la
++    disposition des feuilles sur une tige, les spirales de coquillages, etc.
++    Elle est utilis&eacute;e pour mod&eacute;liser et comprendre ces ph&eacute;nom&egrave;nes.
+   </div>
+--->
+ 
++  <div>
++    <code><span class="Mod">Sys</span>.argv</code> est un tableau qui contient les &eacute;l&eacute;ments
++    de la ligne de commande qui a lanc&eacute; le programme.
++  </div>
+ 
+-  <!-- ========================================================= -->
+ 
++  <!-- ======================================================== -->
+   <hr />
+ 
+-  <h3 id="ref_mswindows"><span>MS Windows</span></h3>
+-
++  <h2 id="def_exn">Les Exceptions</h2>
+ 
+   <div>
+-    Here is below a non-exhaustive list of differences between a Linux
+-    environment and a Cygwin/MingW environment with protz's OCaml:
++    Dans le programme pr&eacute;c&eacute;dent, l'expression
++    <code>int_of_string <span class="Mod">Sys</span>.argv.<span class="Stat">(</span><span class="Const">1</span><span class="Stat">)</span></code>
++    est susceptible de produire 2 types d'exceptions&nbsp;:<br />
++    <code>
++    Exception: Invalid_argument "index out of bounds"
++    </code><br />
++    si le programme est appel&eacute; sans arguement, ce qui aura pour r&eacute;sultat
++    de tenter d'acc&eacute;der à un index en dehors des valeurs possibles pour
++    le tableau
++    <code> <span class="Mod">Sys</span>.argv<span class="Stat"> </code>,
++    ou bien<br />
++    <code>
++    Exception: Failure "int_of_string".
++    </code><br />
++    si l'argument n'est pas convertible en entier, comme par exemple si le programme
++    est invoqu&eacute; avec&nbsp;:<br />
++    <code>
++    $ ocaml fib.ml alpha
++    </code><br />
+   </div>
+ 
+-  <ul>
+-
+-    <li>
+-      the C stub will have the <code>.dll</code> filename extension
+-      instead of <code>.so</code>
+-    </li>
+-
+-    <li>
+-      <code>ocamlc -where</code>
+-      returns
+-      <code>C:\OCaml\lib</code>
+-      but Cygwin needs file separators to be like
+-      <code>C:/OCaml/lib</code>
+-    </li>
+-
+-    <li>
+-      no need to add a <code>.exe</code> file extension,
+-      the compiler will transparently do this for us
+-    </li>
+-
+-    <li>
+-      using protz's ocaml we can define the C compiler as:
+-      <code>export CC="/bin/i686-w64-mingw32-gcc"</code>
+-      because protz's ocaml uses
+-      <a href='https://www.mingw-w64.org/'>MingW</a>'s toolchain.
+-    </li>
+-
+-  </ul>
++  <div>
++    Avec le couple <code>try</code> / <code>with</code> utilis&eacute;
++    avec le caract&egrave;re d'englobement <code>_</code>,
++    il est possible de renvoyer une valeur alternative quelque soit
++    l'exception rencontr&eacute;e&nbsp;:
++  </div>
+ 
+ <pre>
++<span class="Stat">let</span> <span class="Const">()</span> <span class="Stat">=</span>
++  <span class="Stat">let</span> n <span class="Stat">=</span>
++    <span class="Stat">try</span> int_of_string <span class="Mod">Sys</span>.argv.<span class="Stat">(</span><span class="Const">1</span><span class="Stat">)</span>
++    <span class="Stat">with</span> <span class="Stat">_</span> <span class="Stat">-&gt;</span> <span class="Const">100</span>
++  <span class="Stat">in</span>
++  <span class="Stat">let</span> li <span class="Stat">=</span> fib n <span class="Stat">in</span>
++  <span class="Stat">let</span> s <span class="Stat">=</span> <span class="Mod">String</span>.concat <span class="Const">&quot; &quot;</span> <span class="Stat">(</span><span class="Mod">List</span>.map string_of_int li<span class="Stat">)</span> <span class="Stat">in</span>
++  print_endline s<span class="Stat">;</span>
++<span class="Stat">;;</span>
+ </pre>
+ 
++  <div>
++    Il est &eacute;galement possible de r&eacute;aliser un traitement
++    diff&eacute;rent en fonction de l'exception rencontr&eacute;e&nbsp;:
++  </div>
+ 
+-  <!-- ========================================================= -->
++<pre>
++<span class="Stat">let</span> <span class="Const">()</span> <span class="Stat">=</span>
++  <span class="Stat">let</span> n <span class="Stat">=</span>
++    <span class="Stat">try</span> int_of_string <span class="Mod">Sys</span>.argv.<span class="Stat">(</span><span class="Const">1</span><span class="Stat">)</span>
++    <span class="Stat">with</span>
++    <span class="Stat">|</span> <span class="Const">Invalid_argument</span> <span class="Stat">_</span> <span class="Stat">-&gt;</span> <span class="Const">100</span>    <span class="Comm">(* default value *)</span>
++    <span class="Stat">|</span> <span class="Const">Failure</span> <span class="Stat">_</span> <span class="Stat">-&gt;</span>    <span class="Comm">(* exit with an error message *)</span>
++        prerr_endline <span class="Const">&quot;please provide an integer&quot;</span><span class="Stat">;</span>
++        exit <span class="Const">1</span>
++  <span class="Stat">in</span>
++</pre>
+ 
+-  <hr style="margin-top:2.4em;" />
+ 
+-  <h3 id="ref_conclusion"><span>Conclusion, going further</span></h3>
++  <!-- ======================================================== -->
++  <hr />
+ 
+ 
+   <div>
+-    This was an introduction tutorial, for more complete details, refer to
+-    the official OCaml manual
+-
+-    <span class="for_screen">
+-      <a href="https://v2.ocaml.org/releases/4.14/htmlman/intfc.html"
+-      >on the page about this subject</a>.
+-    </span>
+-
+-    <span class="for_print">
+-      at Chapter 19 <em>Interfacing C with OCaml</em>, page:<br />
+-      <a href="#"
+-      >https://v2.ocaml.org/releases/4.14/htmlman/intfc.html</a>
+-    </span>
++    Voil&agrave; pour un premier &eacute;pisode, il est un peu long et peu amusant
++    pour un d&eacute;but, mais il faux comprendre le typage des expressions
++    avant de pouvoir aller plus loin vers des choses plus &eacute;volu&eacute;es.
+   </div>
+ 
+   <div>
+-    If there are questions that have not found an answer on this page
+-    nor in the official manual,
+-    <span class="for_screen">
+-      you can join the
+-      <a href="https://discuss.ocaml.org/"
+-      >ocaml discuss forum</a>
+-      to find help.<br />
+-      Or on other <a href="https://ocaml.org/community">websites</a>.
+-    </span>
+-    <span class="for_print">
+-      you can join the <strong>ocaml discuss forum</strong>
+-      to find help, at this address:<br />
+-      <a href="#">https://discuss.ocaml.org/</a>
+-      <br />
+-      Or on other websites:<br />
+-      <a href="#">https://ocaml.org/community</a>.
+-    </span>
++    Dites-moi si vous l'avez appr&eacute;ci&eacute; ou pas, pour que je sache si je
++    dois en faire d'autres ou pas.
+   </div>
+ 
+-  <div>
+-    You may also find examples to follow from the
+-    <span class="for_screen">
+-      other ocaml-c interfaces
+-      <a href="https://opam.ocaml.org/packages/"
+-      >registered in the Opam</a> repository.
+-    </span>
+-    <span class="for_print">
+-      <strong>other ocaml-c interfaces</strong>
+-      registered in the Opam repository:<br />
+-      <a href="#">https://opam.ocaml.org/packages/</a>
+-    </span>
+-  </div>
+ 
+-  <!--
++  <h2 id="def_further">Aller plus loin</h2>
++
+   <div>
+-    In the French language, there was also these 2 pages on the
+-    Epita's wiki:
+-    <br />
+-    <span class="for_screen">
+-      <a href="http://wiki-prog.infoprepa.epita.fr/index.php/20110307:TP:C:OCaml"
+-        >20110307:TP:C:OCaml</a><br/>
+-      <a href="http://wiki-prog.infoprepa.epita.fr/index.php/Programmation:C:OCaml"
+-        >Programmation:C:OCaml</a>
+-    </span>
+-    <span class="for_print">
+-      <a href="#"
+-        >http://wiki-prog.infoprepa.epita.fr/index.php/20110307:TP:C:OCaml</a><br/>
+-      <a href="#"
+-        >http://wiki-prog.infoprepa.epita.fr/index.php/Programmation:C:OCaml</a>
+-    </span>
++    Si vous aimez apprendre en faisant de petits jeux,
++    vous pouvez vous rendre &agrave; cette adresse pour trouver de
++    <a href="https://github.com/fccm/ocaml-sdl2-minigames">petits exemples de mimi-jeux en OCaml</a>.
+   </div>
+-  -->
+ 
+   <div>
+-    And I don't know if it's worth it (I've never tryed it), but just be aware that
+-    SWIG seems to provide
+-    <span class="for_screen">
+-      <a href="http://www.swig.org/Doc4.0/Ocaml.html">support for OCaml</a>.
+-    </span>
+-    <span class="for_print">
+-      <strong>support for OCaml</strong>:<br />
+-      <a href="#">http://www.swig.org/Doc4.0/Ocaml.html</a>
+-    </span>
++    Vous pouvez lire cette excellente
++    <a href="https://www.good-eris.net/formation-ocaml/intro.html"
++       >"Introduction au langage OCaml"</a> par Maxence Guesdon
++     sous licence CC-by-nc-sa.
+   </div>
+ 
+   <div>
+-    The book RealWorldOCaml also provides documentation about
+-    
+-    <span class="for_screen">
+-      <a href="https://dev.realworldocaml.org/foreign-function-interface.html"
+-        >Foreign Function Interface (FFI)</a>.
+-    </span>
+-    <span class="for_print">
+-      <strong>Foreign Function Interface (FFI)</strong>:<br />
+-      <a href="#">https://dev.realworldocaml.org/foreign-function-interface.html</a>
+-    </span>
++    <a href="https://homepages.loria.fr/EHainry/cours/m4208/introcaml.html"
++      >cours d'introduction &agrave; ocaml</a> par Emmanuel Hainry.
+   </div>
+ 
+   <div>
+-    Brendan Long wrote an article:
+-    <br />
+-    <span class="for_screen">
+-      <a href="https://www.brendanlong.com/easy-mistakes-when-writing-ocaml-c-bindings.html"
+-        >Easy mistakes when writing OCaml C bindings</a>.
+-    </span>
+-    <span class="for_print">
+-      <strong>Easy mistakes when writing OCaml C bindings</strong>:<br />
+-      <a href="#">https://www.brendanlong.com/easy-mistakes-when-writing-ocaml-c-bindings.html</a>
+-    </span>
++    Divers exemples (avec &eacute;quivalences dans d'autres langages) sur le site
++    <a href="http://rosettacode.org/wiki/Category:OCaml"
++      >RosettaCode.org</a>.
+   </div>
+ 
+   <div>
+-    On JaneStreet blog, Vladimir Brankov wrote an article about
+-    <span class="for_screen">
+-      <a href="https://blog.janestreet.com/faster-ocaml-to-c-calls/"
+-        >Optimising OCaml to C calls</a>.
+-    </span>
+-    <span class="for_print">
+-      <strong>Optimising OCaml to C calls</strong>:<br />
+-      <a href="#">https://blog.janestreet.com/faster-ocaml-to-c-calls/</a>
+-    </span>
++    Tutoriel sur comment r&eacute;aliser un mini
++    <a href="http://decapode314.free.fr/re/tut/ocaml-re-tut.html"
++      >snake-game</a>.
+   </div>
+ 
+-
+-
+-  <!-- ========================================================= -->
+-
+-  <hr style="margin-top:2.4em;" />
+-
+-  <h3 id="ref_version"><span>Version of this document</span></h3>
+-
+   <div>
+-    2024-09-24.a
++    <a href="https://fr.wikibooks.org/wiki/Objective_Caml"
++      >Wikibook sur ocaml</a> par divers auteurs&nbsp;:
++    <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Bases&offset=&limit=500&action=history"
++      >1</a> /
++    <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Structures&offset=&limit=500&action=history"
++      >2</a> /
++    <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Modules&offset=&limit=500&action=history"
++      >3</a>.
+   </div>
+ 
+-
+-  <hr style="margin-top:2.4em;" />
+-
+   <div>
+-    If you have saved this document, you can check for up-dates or
+-    corrections from
+-    <span class="for_screen">
+-      <a href="http://decapode314.free.fr/ocaml/ocaml-c-interface.html"
+-      >its original internet location</a>.
+-    </span>
+-    <span class="for_print">
+-      <strong>its original internet location</strong>:<br />
+-      <a href="#"
+-      >http://decapode314.free.fr/ocaml/ocaml-c-interface.html</a>
+-    </span>
++    Comm<span></span>ent utiliser les structures de type 
++    <a href="https://ocaml.org/docs/sets">Set</a>, et
++    <a href="https://ocaml.org/docs/maps">Map</a>.
+   </div>
+ 
+ 
+-  <!-- ========================================================= -->
++  <!-- ======================================================== -->
++  <hr />
+ 
+-  <hr style="margin-top:2.4em;" />
+ 
+-  <h3 id="ref_licence"><span>License</span></h3>
++  <!-- Notice -->
+ 
+-  <div id="ref_copy">
+-    &copy; 2007-2024 Florent Monnier<br />
+-    You can use this document according to the terms of either one of
+-    these licenses:<br />
+-    <ul class="for_screen">
+-      <li>
+-        <a href="http://www.gnu.org/licenses/fdl.html"
+-        >GNU/FDL license</a>, or
+-      </li>
+-      <li>
+-        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+-        >CC-by-sa license</a>
+-      </li>
+-    </ul>
++  <h4 id="def_notice">Notice d'utilisation</h4>
+ 
+-    <span class="for_print">
+-      <strong>GNU/FDL license</strong>: &nbsp;
+-      <a href="#"
+-      >http://www.gnu.org/licenses/fdl.html</a>
+-      <br />
+-      or
+-      <br />
+-      <strong>CC-by-sa license</strong>: &nbsp;
+-      <a href="#"
+-      >http://creativecommons.org/licenses/by-sa/4.0/</a>
+-      <br />
+-    </span>
++  <div>&copy; 2005 2006 2007 2018 Florent Monnier</div>
+ 
+-    Which means basically that you can redistribute this document with or without
+-    modifications, as long as you keep the copyright and the license.<br />
+-    Thanks to Eric Norige, for corrections of the English.<br />
+-    This document has been modified after Eric Norige corrected the English,
+-    please write to me for other corrections.
++  <div class="notice">
++    Ce document est distribu&eacute; sous licence
++    <a href="http://www.fsf.org/licensing/licenses/fdl.html">FDL</a>,
++    ce qui signifie que vous pouvez le redistribuer avec ou sans am&eacute;liorations
++    du moment d'en conserver le droit d'auteur (copyright) et la licence.<br />
++    Vous pouvez &eacute;galement utiliser la licence
++    <a href="http://creativecommons.org/licenses/by-sa/2.5/">CC-by-sa</a>
++    si vous pr&eacute;f&eacute;rez.<br />
++    <!--
++    Vous &ecirc;tes &eacute;galement invit&eacute; &agrave; m'&eacute;crire
++    pour me sugg&eacute;rer des am&eacute;liorations, ou simplement pour me
++    soumettre des suggestions
++    <div id="contact">&nbsp;</div>
++    -->
+   </div>
+ 
+-  <hr />
+-
+   <!--
+-  <div id="footer">
+-
+-    <div id="contact">
+-
+-      <span class="for_screen">
+-        If you want to leave me kind comments,
+-        you can do so on my GitHub issue pages, or
+-        on my rossetta user page.
+-      </span>
+-
+-      <span class="for_print">
+-        Don't contact me using this email:<br />
+-
+-        <code>monnier.florent at gmail dot com</code><br />
+-
+-        Don't contact me with this previous email anymore,
+-        I don't remember its password, and the email recovery system
+-        from its email provider, I'm not able to use it.
+-      </span>
+-
+-    </div>
+-
++  <div class="notice">
++    Merci &agrave; Xavier Hienne pour la relecture.
+   </div>
+   -->
+ 
++  <hr />
+ 
+-  <div style="margin-top: 2em; border:0;" class="for_screen">
++  <div>
++    Camellement v&ocirc;tre&nbsp;!
+     <!--
+-    <a href="http://caml.inria.fr/ocaml/index.html" title="OCaml website"
+-    ><img src="http://caml.inria.fr/pub/logos/caml.80x30.gif"
+-      alt="The Caml Language" style="border:none;" /></a>
++    <div id="contact">&nbsp;</div>
+     -->
+-    <a href="http://ocaml.org/" title="OCaml website"
+-      ><img src="./ocaml-logo.png"
+-         alt="The OCaml Programming Language" style="border:none;" /></a>
+   </div>
+ 
+-  <div class="home">
+-    <img border="0" src="/icons/back.gif" />
+-    <a href="/ocaml/">my ocaml home</a>
++
++  <!-- ======================================================== -->
++  <hr />
++
++  <div style="margin-top:1.2em; border:0;">
++    <a href=".">sommaire</a>
++  </div>
++
++  <div style="margin-top:1.2em; border:0;">
++    <a href="https://ocaml.org/index.fr.html" title="site internet d'OCaml"
++      ><img src="./ocaml-logo.png" alt="The Caml Language" style="border:none;" /></a>
+   </div>
+ 
+ </body>
+ </html>
+-<!-- vim: sw=2 sts=2 ts=2 et
++<!-- vim: sw=2 sts=2 ts=2 et fdm=marker
+  -->
