@@ -1,0 +1,22 @@
+--- didacticiel-ocaml-10.html	2026-05-10 09:43:54.005275623 +0200
++++ didacticiel-ocaml-11.html	2026-05-10 09:43:54.013275623 +0200
+@@ -3,7 +3,6 @@
+ <head>
+   <title>Introduction &agrave; OCaml</title>
+   <meta http-equiv="content-type" content="text/html; charset=utf8" />
+-  <meta name="robots" content="noindex" />
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width" />
+   <meta name="keywords" content="ocaml, tutoriel, didactitiel, documentation, d&eacute;butant" />
+@@ -2157,6 +2156,11 @@
+   </div>
+ 
+   <div>
++    Un <a href="https://ocaml.gelez.xyz/">Cours alternatif d’OCaml</a> sous license <span>GPLv3.0</span>,
++    mainly written by Ana Gelez.
++  </div>
++
++  <div>
+     Comm<span></span>ent utiliser les structures de type 
+     <a href="https://ocaml.org/docs/sets">Set</a>, et
+     <a href="https://ocaml.org/docs/maps">Map</a>.
