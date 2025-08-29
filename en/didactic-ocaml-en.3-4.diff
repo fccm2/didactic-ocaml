@@ -1,0 +1,183 @@
+--- didactic-ocaml-en.3.html	2026-05-10 09:44:19.266274936 +0200
++++ didactic-ocaml-en.4.html	2026-05-10 09:44:19.280274936 +0200
+@@ -102,6 +102,8 @@
+ }
+ 
+ .warning { background-color:#F62; color:#000; }
++.info { background-color:#26F; color:#000; }
++.info a { color:#268; }
+ </style>
+ </head>
+ <body>
+@@ -109,6 +111,10 @@
+   <!-- Warning -->
+ 
+   <div class="warning">Translation in Progress</div>
++  <div class="info">
++    The original version in french-language is still
++    <a href="/ocaml/didacticiel-ocaml.html">available here</a>.
++  </div>
+ 
+   <!-- Notice -->
+ 
+@@ -124,10 +130,16 @@
+     You can also use the
+     <a href="http://creativecommons.org/licenses/by-sa/2.5/">CC-by-sa</a>
+     license if you prefer.<br />
++    You are also invited to send me messages to suggest me improuvements,
++    or to fix errors.
++    <!--
+     Vous &ecirc;tes &eacute;galement invit&eacute; &agrave; m'&eacute;crire
+     pour me sugg&eacute;rer des am&eacute;liorations, ou simplement pour me
+-    soumettre des suggestions
++    soumettre des suggestions.
++    -->
++    <!--
+     <div id="contact">&nbsp;</div>
++    -->
+   </div>
+ 
+   <div class="notice">
+@@ -144,7 +156,7 @@
+   </div>
+ 
+   <div>
+-    (Don't try to contact me by electronic mail, I lost the password.)
++    (Don't try to contact me on this electronic mail anymore, I forgot the password.)
+     <div id="contact">&nbsp;</div>
+   </div>
+ 
+@@ -235,6 +247,9 @@
+   </div>
+ 
+   <div>
++    <!--
++    Voici pour vous mettre l'eau &agrave; la bouche et vous donner l'envie de
++    -->
+     If you want to continue, then find an online interactive loop to begin,
+     or even install it from:
+     <a href="https://ocaml.org/docs/install.html"
+@@ -278,6 +293,12 @@
+   </div>
+ 
+ 
++  <!--
++  <div class="nb">
++    Vous pouvez &eacute;galement am&eacute;liorer les capacit&eacute;s d'&eacute;dition
++    de l'interpr&eacute;teur interactif en utilisant <code>rlwrap</code>&nbsp;:
++  </div>
++  -->
+   <div class="nb">
+     It's also possible to make it easier to make edits in the interactive loop
+     with the <code>rlwrap</code> tool, like this:
+@@ -294,7 +315,6 @@
+   </div>
+ 
+   <!--
+-  -->
+   <div class="nt">
+     In the name <code>rlwrap</code>, the 2 letters <code>rl</code> mean
+     <code>read-line</code>, it means that it's a command to wrap the interactive
+@@ -302,6 +322,7 @@
+     past lines with the <code>up</code> arrow, and moving left and right, with
+     left, and right arrows).
+   </div>
++  -->
+ 
+ 
+   <h4 id="def_tprim">Basic Types</h4>
+@@ -397,8 +418,8 @@
+     <code>char</code> as you would expect.
+     The index starts at <code>0</code> (zero) for the first character, and
+     the last one is <code>n-1</code>, with <code>n</code> been the number
+-    of chars in the string.<br />
+-    (If the string contains some utf-8 special characters, n might be different
++    of chars in the string.
++    (if the string contains some utf-8 special characters, n might be different
+     than what you expect, because special characters may take 2 bytes/octets.)
+   </div>
+ 
+@@ -578,7 +599,6 @@
+   </div>
+ 
+ 
+-  <div class="warning">Translation to be done.</div>
+   <div>
+     Les variables modifiables transversalement seront vues ult&eacute;rieurement,
+     <!-- TODO -->
+@@ -660,20 +680,11 @@
+ </pre>
+ 
+ 
+-  <!--
+   <div class="nb">
+     On r&eacute;alise l'empilement et le d&eacute;pilement des
+     &eacute;l&eacute;ments uniquement au sommet de la pile.
+     Les listes ne sont donc pas de taille fixe comme les tableaux.
+   </div>
+-  -->
+-  <div class="nb">
+-    We add new elements, and take elements back, from a list only
+-    from its top.
+-    Les listes ne sont donc pas de taille fixe comme les tableaux.
+-    List then don't have a size already defined from the beginning,
+-    like arrays.
+-  </div>
+ <pre>
+ # <span class="Stat">let</span> my_list <span class="Stat">=</span> <span class="Stat">[</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span> <span class="Stat">]</span> <span class="Stat">;;</span>
+ <span class="Stat">val</span> my_list : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">]</span>
+@@ -690,41 +701,24 @@
+     va venir prendre des assiettes propres lorsqu'on en a besoin.)
+   </div>
+ 
+-  <!--
++
+   <div class="nb">
+     L'empilement et le d&eacute;pilement d'&eacute;l&eacute;ments peuvent
+     &ecirc;tre r&eacute;alis&eacute;s respectivement &agrave; partir et
+     jusqu'&agrave; la liste vide&nbsp;:
+   </div>
+-  -->
+-  <div class="nb">
+-    Adding and removing elements from a list, can be made respectively,
+-    from, and until, the empty list:
+-  </div>
+ <pre>
+ # <span class="Const">[]</span> <span class="Stat">;;</span>
+ - : 'a <span class="Type">list</span> <span class="Stat">=</span> <span class="Const">[]</span>
+ </pre>
+-  <!--
+   <div class="nt">
+     (Le &laquo;&nbsp;'a&nbsp;&raquo; indique alors que le type est ind&eacute;fini.)
+   </div>
+-  -->
+-  <div class="nt">
+-    (When a type is not defined yet, it is indicated with the single quote before its
+-    type name.)
+-  </div>
+ 
+-  <!--
+   <div>
+     Les listes sont bien adapt&eacute;es lorsque ses &eacute;l&eacute;ments
+     doivent &ecirc;tre parcourus de mani&egrave;re s&eacute;quentielle.
+   </div>
+-  -->
+-  <div>
+-    Using the list data-structure is a good choice when the elements have to
+-    be iteracted in a sequencial way.
+-  </div>
+ 
+ 
+   <!-- Tuples -->
+@@ -739,6 +733,11 @@
+     plusieurs &eacute;l&eacute;ments (qui seront alors regroup&eacute;s dans un
+     tuple).
+   </div>
++  <div class="nb">
++    Tuples can group elements that can be of several different types. They usually
++    group a small number of elements together.
++    They are used for example when a function can return several elements.
++  </div>
+ <pre>
+ # <span class="Stat">(</span><span class="Const">3</span>, <span class="Const">'F'</span><span class="Stat">)</span> <span class="Stat">;;</span>
+ - : <span class="Type">int</span> <span class="Stat">*</span> <span class="Type">char</span> <span class="Stat">=</span> <span class="Stat">(</span><span class="Const">3</span>, <span class="Const">'F'</span><span class="Stat">)</span>
