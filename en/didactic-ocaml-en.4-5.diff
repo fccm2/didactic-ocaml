@@ -1,0 +1,11 @@
+--- didactic-ocaml-en.4.html	2026-05-10 09:44:19.280274936 +0200
++++ didactic-ocaml-en.5.html	2026-05-10 09:44:19.293274936 +0200
+@@ -123,7 +123,7 @@
+   <div>&copy; 2005 2006 2007 2018 Florent Monnier</div>
+ 
+   <div class="notice">
+-    This file is provided under
++    This tutorial is provided under
+     <a href="http://www.fsf.org/licensing/licenses/fdl.html">FDL</a> license,
+     which means that you can reuse it, with or without modifications
+     as long as the copyright is preserved, and its license.<br />
