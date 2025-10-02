@@ -1,0 +1,370 @@
+--- didactic-ocaml-en.5.html	2026-05-10 09:44:19.293274936 +0200
++++ didactic-ocaml-en.6.html	2026-05-10 09:44:19.304274935 +0200
+@@ -1,7 +1,7 @@
+ <!DOCTYPE html>
+ <html>
+ <head>
+-<title>Didactic-ocaml</title>
++<title lang="en">Didactic-ocaml</title>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width" />
+ <meta http-equiv="content-type" content="text/html; charset=utf8" />
+@@ -149,18 +149,18 @@
+ 
+   <h1>Introduction about OCaml</h1>
+ 
+-  <div>
++  <div lang="en">
+     OCaml (also called Objective Caml) is a programming and scripting language.
+     The goal of this document is to provide an introduction about the basic elements
+     of this programming language.
+   </div>
+ 
+-  <div>
++  <div lang="en">
+     (Don't try to contact me on this electronic mail anymore, I forgot the password.)
+     <div id="contact">&nbsp;</div>
+   </div>
+ 
+-  <div>
++  <div lang="en">
+     As explained on the website of this programming language, ocaml is
+     supposed to be a programming language created by the
+     <a href="http://www.inria.fr/">INRIA</a>.<br />
+@@ -174,7 +174,7 @@
+   <!-- ======================================================== -->
+   <hr />
+ 
+-  <ul>
++  <ul lang="en">
+     <li><a href="#def_intractif">The interactive loop</a></li>
+     <li><a href="#def_tprim">Basic Types</a></li>
+     <li><a href="#def_transtypage">Transtyping</a></li>
+@@ -202,7 +202,7 @@
+ 
+   <h4 id="def_difmodexe">Different Execution modes</h4>
+ 
+-  <div>
++  <div lang="en">
+     OCaml provides several execution modes:
+   </div>
+ 
+@@ -227,7 +227,7 @@
+   </ul>
+ 
+ 
+-  <div>
++  <div lang="en">
+     All these execution modes will be seen with more details later.
+     In this tutorial, we first experiment with the top-level.
+   </div>
+@@ -236,7 +236,7 @@
+ 
+   <h4 id="def_styles">Different Programming Styles</h4>
+ 
+-  <div>
++  <div lang="en">
+     We can adopt several programming styles with ocaml: functional, imperative, object,
+     modular, and mix these different programming styles.<br />
+     The functional style is supposed to be better when it's about to avoid side effects.<br />
+@@ -246,7 +246,7 @@
+     update or calculate several elements at the same times.<br />
+   </div>
+ 
+-  <div>
++  <div lang="en">
+     <!--
+     Voici pour vous mettre l'eau &agrave; la bouche et vous donner l'envie de
+     -->
+@@ -262,7 +262,7 @@
+ 
+   <h3 id="def_intractif">The interactive loop</h3>
+ 
+-  <div>
++  <div lang="en">
+     To begin, one of the first step is to get used to the type system of ocaml
+     which is a quite strong type system.  It might feel constraining at the
+     beginning but it could be of some help, while using it.
+@@ -280,14 +280,14 @@
+ #
+ </pre>
+ 
+-  <div>
++  <div lang="en">
+     Every expression should be followed by two
+     '<code><span class="Stat">;</span></code>':
+     <br />
+     <code><span class="Stat">;;</span></code>
+   </div>
+ 
+-  <div>
++  <div lang="en">
+     In order to understand the type system, we will see the primitive types first,
+     they are the base elements:
+   </div>
+@@ -431,7 +431,7 @@
+ <span class="Const">Exception</span>: <span class="Const">Invalid_argument</span> <span class="Const">&quot;index out of bounds&quot;</span>.
+ </pre>
+ 
+-  <div>
++  <div lang="en">
+     Defining, raising and catching exceptions will be seen below.
+   </div>
+ 
+@@ -445,7 +445,7 @@
+ </pre>
+ 
+ 
+-  <div>
++  <div lang="en">
+     This type is a kind of empty entity.
+     It is used for example when a function doesn't need any parameters.
+     This is also the default returned type when a function does something
+@@ -478,7 +478,7 @@
+ 
+   <h4 id="def_transtypage">Transtyping</h4>
+ 
+-  <div>
++  <div lang="en">
+     OCaml features a strong type system, because it is believed that a statically
+     strong type system, is a great help, in order to avoid programming errors.
+     OCaml will not do any "implicit type coercion", because it is believed that it
+@@ -560,7 +560,7 @@
+ <span class="Stat">val</span> my_item : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">128</span>
+ </pre>
+ 
+-  <div>
++  <div lang="en">
+     Here the element that we define is an integer number, and it will be possible
+     to use it everywhere after its definition (where an integer type is expected),
+     using the name that we used to define it.
+@@ -599,7 +599,7 @@
+   </div>
+ 
+ 
+-  <div>
++  <div lang="en">
+     Les variables modifiables transversalement seront vues ult&eacute;rieurement,
+     <!-- TODO -->
+     mais si vous faites le choix d'adopter un style fonctionel vous &eacute;viterez leur usage&nbsp;;
+@@ -621,7 +621,7 @@
+   <hr />
+ 
+ 
+-  <div>
++  <div lang="en">
+     OCaml fournit plusieurs structures permettant de regrouper des
+     &eacute;l&eacute;ments (comme les types primitifs vu en d&eacute;but du didacticiel)&nbsp;:
+     les tableaux (type 'array'), les listes (type 'list') et les tuples.
+@@ -715,7 +715,7 @@
+     (Le &laquo;&nbsp;'a&nbsp;&raquo; indique alors que le type est ind&eacute;fini.)
+   </div>
+ 
+-  <div>
++  <div lang="en">
+     Les listes sont bien adapt&eacute;es lorsque ses &eacute;l&eacute;ments
+     doivent &ecirc;tre parcourus de mani&egrave;re s&eacute;quentielle.
+   </div>
+@@ -770,7 +770,7 @@
+     ont leur type. Nous allons voir &ccedil;a plus bas.
+   </div>
+ 
+-  <div>
++  <div lang="en">
+     Le fait que les fonctions puissent être plac&eacute;e dans des structures
+     et pass&eacute;es en param&egrave;tre de fonction, on dit que les fonctions sont
+     des &eacute;l&eacute;ments de premi&egrave;re classe
+@@ -820,7 +820,7 @@
+ # length <span class="Stat">;;</span>
+ - : <span class="Type">string</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+ </pre>
+-  <div>
++  <div lang="en">
+     Le type d'une fonction est en quelque sorte ce que l'on appelle le
+     prototype d'une fonction dans d'autres langages, mais ce n'est pas
+     totalement &eacute;quivalent en raison des possibilit&eacute;s d'application
+@@ -851,7 +851,7 @@
+ </pre>
+ 
+ 
+-  <div>
++  <div lang="en">
+     Ces fonctions font partie du module
+     <a href="https://ocaml.org/releases/4.11/htmlman/libref/Stdlib.html"
+     >'Stdlib'</a>
+@@ -900,13 +900,13 @@
+   <hr />
+ 
+ 
+-  <div>
++  <div lang="en">
+     Dans un programme ou un script, nous avons souvent besoin de pouvoir
+     ex&eacute;cuter certaines parties de codes plut&ocirc;t que d'autres.
+     OCaml offre plusieurs structures de contr&ocirc;le pour cela.
+   </div>
+ 
+-  <div>
++  <div lang="en">
+     (Si vous connaissez d&eacute;j&agrave; des langages de programmation ou de
+     script, vous serez peut-&ecirc;tre un peu d&eacute;pays&eacute; par celles
+     d'OCaml.)
+@@ -914,7 +914,7 @@
+ 
+   <!-- If -->
+ 
+-  <h2 def="def_if">Condition IF</h2>
++  <h2 id="def_if">Condition IF</h2>
+ 
+   <div class="nb">
+     La fa&ccedil;on la plus simple d'utiliser la structure 'if' ("si" en fran&ccedil;ais),
+@@ -929,7 +929,7 @@
+     est retourn&eacute;.
+   </div>
+ 
+-  <div>
++  <div lang="fr">
+     (Pour l'&eacute;galit&eacute; utilisez de pr&eacute;f&eacute;rence
+     &laquo;&nbsp;=&nbsp;&raquo; &agrave; &laquo;&nbsp;==&nbsp;&raquo; sauf si vous
+     &ecirc;tes s&ucirc;r que vous recherchez strictement l'&eacute;galit&eacute;
+@@ -996,7 +996,7 @@
+ - : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;sup&quot;</span>
+ </pre>
+ 
+-  <div>
++  <div lang="en">
+     Afin de garantir le type retourn&eacute; par la structure if, ses deux branches
+     <code><span class="Stat">then</span></code> et <code><span class="Stat">else</span></code>
+     doivent imp&eacute;rativement retourner des &eacute;l&eacute;ments de m&ecirc;me type
+@@ -1046,7 +1046,7 @@
+ - : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+ 
+-  <div>
++  <div lang="en">
+     Ici nous voyons appara&icirc;tre comme type de retours pour l'ensemble de
+     l'expression le type &laquo;&nbsp;unit&nbsp;&raquo;. En effet la structure
+     de contr&ocirc;le for correspond au type de programmation imp&eacute;rative,
+@@ -1075,7 +1075,7 @@
+ - : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+ 
+-  <div>
++  <div lang="en">
+     Pour &eacute;viter le style imp&eacute;ratif de cette structure de contr&ocirc;le,
+     OCaml fournit une alternative offrant beaucoup plus de possibilit&eacute;s,
+     et surtout une suret&eacute; tr&egrave;s largement accrue.
+@@ -1132,7 +1132,7 @@
+   <!-- Match -->
+ 
+   <h2 id="def_match">Match</h2>
+-  <div>
++  <div lang="en">
+     <!-- TODO -->
+     Dans son utilisation basique la plus rudimentaire, cette structure de
+     contr&ocirc;le pourrait &ecirc;tre vue comme un &eacute;quivalent de
+@@ -1158,13 +1158,13 @@
+ - : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;deux&quot;</span>
+ </pre>
+ 
+-  <div>
++  <div lang="fr">
+     Ici la valeur de var est 2, l'&eacute;l&eacute;ment correspondant
+     apr&egrave;s la fl&egrave;che est donc retourn&eacute;.
+   </div>
+ 
+ 
+-  <div>
++  <div lang="fr">
+     L'englobement du &laquo;&nbsp;match&nbsp;&raquo; doit toujours &ecirc;tre
+     exhaustif, d'une part, et toutes les expressions suivant chaque englobement
+     doivent &ecirc;tre de m&ecirc;me type. Ce type sera ainsi le type de
+@@ -1225,15 +1225,14 @@
+ -->
+ 
+ 
+-
+-  <div>
++  <div lang="fr">
+     <small>(ici on voit aussi appara&icirc;tre du commentaire entre les
+     s&eacute;quences
+       '<code><span class="Comm">(*</span></code>' et
+       '<code><span class="Comm">*)</span></code>')</small>
+   </div>
+ 
+-  <div>
++  <div lang="fr">
+     En utilisant cette possibilit&eacute; de d&eacute;sempilement au sein
+     d'une boucle faite avec une fonction r&eacute;cursive, cela permet alors
+     de parcourir tous les &eacute;l&eacute;ments d'une liste.
+@@ -1269,7 +1268,7 @@
+   <h2 id="def_iter">"Foreach"</h2>
+   <h4>(Iteration sur les listes et les tableaux)</h4>
+ 
+-  <div>
++  <div lang="fr">
+     Si vous connaissez d'autres langages et que vous recherchez un
+     &eacute;quivalent de la structure foreach, la m&ecirc;me chose peut-&ecirc;tre
+     r&eacute;alis&eacute;e pour parcourir tous les &eacute;l&eacute;ments d'une
+@@ -1303,7 +1302,7 @@
+   </div>
+ 
+ 
+-  <div>
++  <div lang="fr">
+     Si la fonction for_each n'est utilis&eacute;e qu'&agrave; un seul endroit
+     du code, elle peut &ecirc;tre d&eacute;finie localement au sein de
+     l'expression en cours, plut&ocirc;t que globalement.
+@@ -1321,7 +1320,7 @@
+ - : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">14</span><span class="Stat">;</span> <span class="Const">54</span><span class="Stat">;</span> <span class="Const">34</span><span class="Stat">;</span> <span class="Const">84</span><span class="Stat">;</span> <span class="Const">24</span><span class="Stat">]</span>
+ </pre>
+ 
+-  <div>
++  <div lang="fr">
+     Elle ne sera alors disponible et accessible que dans l'expression
+     en cours, comme vous pouvez le v&eacute;rifier&nbsp;:
+   </div>
+@@ -1371,7 +1370,7 @@
+ - : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+ </pre>
+ 
+-  <div>
++  <div lang="fr">
+     Pour parcourir les &eacute;l&eacute;ments d'un tableau au lieu d'une liste,
+     il existe deux fonctions semblables &laquo;&nbsp;iter&nbsp;&raquo; et
+     &laquo;&nbsp;map&nbsp;&raquo; dans le module
+@@ -1389,7 +1388,7 @@
+ 
+   <h2 id="def_record">Using Records</h2>
+ 
+-  <div>
++  <div lang="en">
+     OCaml records are data structures that should be defined before to be used.<br />
+     This data structure is similar than tuples, except than every field can be
+     accessed with a name (the field-name).<br />
+@@ -1437,7 +1436,7 @@
+ 
+   <h2 id="def_record_imup">Les Enregistrements&nbsp;: Mise &agrave; Jour Immuable</h2>
+ 
+-  <div>
++  <div lang="en">
+     (ou "Immutable Update" en anglais)<br />
+     En programmation fonctionnelle les variables ne sont pas sens&eacute;es changer de valeur,
+     pour obtenir un nouvel enregistrement avec un des champs mis &agrave; jour,
+@@ -1494,7 +1493,7 @@
+ 
+   <h2 id="def_variant">Les Variants</h2>
+ 
+-  <div>
++  <div lang="fr">
+     Les variants sont &eacute;galement des types qui doivent &ecirc;tre
+     d&eacute;clar&eacute;s avec une d&eacute;finition.<br />
+     Voici un exemple librement inspir&eacute; d'un exemple de David MENTRE&nbsp;:
+@@ -1524,7 +1523,7 @@
+ 
+   <h2 id="def_warnarr">Mise en garde contre les tableaux</h2>
+ 
+-  <div>
++  <div lang="fr">
+     Attention les tableaux contrairement aux listes sont des structures
+     de type imp&eacute;rative dont les &eacute;l&eacute;ments sont
+     modifi&eacute;s en place, et donc avec ce que l'on appel des effets de bord.
