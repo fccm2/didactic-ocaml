@@ -1,0 +1,23 @@
+--- didacticiel-ocaml-11.html	2026-05-10 09:43:54.013275623 +0200
++++ didacticiel-ocaml-12.html	2026-05-10 09:43:54.033275622 +0200
+@@ -2129,7 +2129,7 @@
+ 
+   <div>
+     <a href="https://homepages.loria.fr/EHainry/cours/m4208/introcaml.html"
+-      >cours d'introduction &agrave; ocaml</a> par Emmanuel Hainry.
++      >Cours d'introduction &agrave; ocaml</a> par Emmanuel Hainry.
+   </div>
+ 
+   <div>
+@@ -2161,6 +2161,11 @@
+   </div>
+ 
+   <div>
++    <a href="https://ocaml.tips/article/Tips_for_Writing_Clean_and_Maintainable_OCaml_Code.html">OCaml Tips</a>,
++    a documentation in English language.
++  </div>
++
++  <div>
+     Comm<span></span>ent utiliser les structures de type 
+     <a href="https://ocaml.org/docs/sets">Set</a>, et
+     <a href="https://ocaml.org/docs/maps">Map</a>.
