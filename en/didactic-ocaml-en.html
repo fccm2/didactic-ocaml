@@ -1,0 +1,1969 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Didactic-ocaml</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="content-type" content="text/html; charset=utf8" />
+<meta name="keywords" content="ocaml, didactic-content, technical-reading, beginner" />
+
+<style type="text/css">
+
+body {
+  color: #000;
+  background-color: #BBB;
+  padding: 1em 9em 2em 2em;
+}
+a {
+  color: #66B;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+div.notice {
+  font-size: 0.8em;
+}
+
+span.mode {
+  font-size: 1.1em;
+  font-style: italic;
+}
+span.detl {
+  font-size: 0.8em;
+  margin-left: 0.6em;
+  padding-left: 0.6em;
+}
+ul#modes li {
+  margin-bottom: 0.5em;
+}
+
+hr {
+  margin-top: 2.4em;
+  margin-bottom: 1.4em;
+  max-width: 76%;
+  min-width: 920px;
+  text-align: left;
+  margin-left: 0;
+}
+
+div {
+  padding: 0.4em 1.4em;
+  margin:  0.4em 1.4em;
+  max-width: 70%;
+  min-width: 820px;
+}
+div.nb {  /* no spacing at the bottom */
+  padding: 0.8em 1.2em 0 1.4em;
+  margin:  0.8em 1.2em 0 1.4em;
+}
+div.nt {  /* no spacing at the top */
+  padding: 0 1.2em 0.6em 1.4em;
+  margin:  0 1.2em 0.6em 1.4em;
+}
+div.nbnt {  /* no spacing at the bottom and at the top */
+  padding: 0 1.2em 0 1.4em;
+  margin:  0 1.2em 0 1.4em;
+}
+
+pre {
+  padding: 0;
+  margin:  0;
+  max-width: 74%;
+  min-width: 900px;
+}
+code,
+pre {
+  background: #111;
+  color: #EEE;
+}
+
+.Type              { color: #00ff00; font-weight: bold; }
+.Module,    .Mod   { color: #8080ff; font-weight: bold; }
+.Const,  .Const { color: #ff40ff; font-weight: bold; }
+.Stat, .Stat  { color: #ffff00; font-weight: bold; }
+.Comment,   .Comm  { color: #00ffff; font-weight: bold; }
+.Error,     .Err   { color: #ffffff; font-weight: bold; background-color: #ff6060; }
+
+.Alert { color: #ff0000; font-weight: bold; }
+
+/*  vim cmd
+
+:%s/="S tatement"/="Stat"/g
+:%s/="C onstant"/="Const"/g
+:%s/="C omment"/="Comm"/g
+:%s/="M odule"/="Mod"/g
+:%s/="E rror"/="Err"/g
+*/
+
+
+#contact {
+  width:221px; height:18px; display:block;
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN0AAAASCAYAAADfett7AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAiZSURBVGiB7dp7sNVVFQfwD/kKyRB8pImChhaaT8RJLSUd7KnUlGFaZj5HKx9Rappj/pHE9NDMEjMNlRFxFLV8FWkZYVooPgJzSiOfCQIVig9Q+uO7T+d3f5x74V7uTZnud+bMOb+912/vtfd67LXWPvSiF73oRS960Ys3Lo7Bcqzbg3MMw514oczV+Py+B+dcXfTDBp2g3xCboU/PsNMjGIfHK8/biVxGvT7srDre9HozsJqYj3tls3sKP8R6Iszdy+fWHpyvO3A5frYSmqH4MZ7FIjyDl/Bza4Di4ik89Hoz0YuewQJ8rdY2yRv7pLsWv+6g/zg5uSdhX2yCdbAtTpM1T7BmOeU15qSr4gj8ANuIMO7HDdih9B8qgrwHZ2Pt2vvr4+uYgQcxRU6FKj6FSyWUuaTMcYsVN+rj4q03EeHPktPlwzW6/XFNC17GlHEfxO34XK1/7/LeIHwbM3FhjeY9hWYZHii/x5W+VkY3EOPxh0J/mShCFV/At7A9rir8jSl9A/DNMu6DuLLQVXEWTsVwXC/7cnVtnjPwBOYVnq/B2Er/ERIh7K19vK3w8P0WfQfjjrLGS7GF7MdBFZqx+AZ2xlSR81XYSkLYEzBddOUkbcPavjgRN5b13YHviC5UcSguqjx3xuh2E/26X+Q1EbtU+tcta5gu+zAV+9TG+JDo+CaFj/vxC7yv9I8SnZ2J8yXkR1tPtosowG1ydF8u+cw0fBVfxs34nRjXWZV318JNOBO/FYMaXGj3rdDtIEL7lYQyl4mx3iYCamBYhe41/FQ88U0YUaHbptBV1zFOFPZxMaSHCj/nVGi2Ku/dJGHWFFGiKhZphq5Plt9/1hpvKes+pow5UYz2nrKWBkaIskzDc7hCDGAg7sZhomwXFR7v1nR6RPCfx3WiDJPEAO+UfYS/4p9YXHi+F4+Wvk3FkA4RhYfROE8c6SAcK0p3UPldVcbPihEvEge9WGR0MN5Zoduz0N4g+38VRpa9GVfor8PsMvfRlXc3w5GixBeW8cfgNxLmN7AjPqLzOFAc2zDZv4ml/f3luw8mi3OcKU5/gBj/6Mo425Z13KqpowNEl4+TtOTOsuajtXUQ/8X5omAfrbQNL21/0XbBl+Dvlecxhe7gStub8bAIvYFzCt3hNbp5Zf4Gzih0x1Ta1hHlrzJfL6TsLBtwVG1tJ+FlbFyeP13e+5GV40VxOlXUT7pTy7x7VNoGiGFNrbRNLPMeWBvvAsmtqt58LfH0Uypt0/CKtob8bivufXvh5Zna5npnS5h5MX4i+7tA01Fehu9W+Hnairni6WX+6h5di1dFfxoYXehmaOskb8VdledWxZx3yP5WT9OuFFLWLWuYLvrUCvuXcY6vtK0tDnBuhb8TC92JFbpNRT6LtJXl6Vgqur5CzL5YLLOBB2Sx14vSNjBLvGKD8b3EY19boXlJlGxXTS9MhHF1je4BbF3jZbl4yAaWlnmHaB+jC93NovSNz+2y4TvW6C/tYKzOYC/cJ6FKA4vkVKiHcfOlWFHFx/BLCWUbPL+1tNVD9HvFmTXwJzGc+v61wgGFJ+KAzhCHeZx447Fy6jYwS/OkHYTN5XSu4vJ25npEW4c7q3xPEZ2qtg+pPC8XvRwpJ95p+KSssXqadgUjZA3fEz1phb3EcKq6sUwzetuiRj+58nueOK7bRc4NzBLD3ZIVc6F5tedlhbn5tfYXZWPWK/2DxevUq4hzxTMMwZzStqgsqooXtDVMeL601+k21z62FON6pp3+rWrPT3UwVmcwGI+1aP+beL9+mmupz9lHBPmZ8qmjrhx1GcESK+5fKwwqPJHTso+2ldgbtZXhctGBxrvkpKjiH+JI62ilM+219608byX5+BD8UaKFhiFu1GKezqBhMI92QDNY9Keuo3PL99ZiWApfrdbT3trXZ0Wj6yoWSphTx4bl+7lummdlWIJ/ibd+bSW0tFaWrmCB5lqrGFB4WtLBnMvltL9Y8uaVYXWuR17SjE6WiPzXq/DXV9vwbh/Ja2ga+8baYqCEnt3F51j0F+VfUNr6SBS2umiMMbADmoVay7LRtqBFXx0drr27SsJzxDMNrbWPEqtv5Z17AneJwEb+j+Zr4GEJA+vCGlX6VqaAM6Qy212X/EuU/KGGR6RyR2T2rIRvRLGrVyOHi9FNKM9zpUBTLSaQ0Lg7sZ2kG1Xl3lOl+rcamCmRQz2nrmKO6NCIWvsB4rRaRTSdQncZ3ZX4t8T775J/Q5wspf8LummOVcFUya0mStK9QfmMkEJN33bfjMdfKPF+ZzFBlPwKCY8GSvVrd63L7nWcI8WCyRL2rY23Sy7zpS7w8zB2EgMZLlVekpsfKSfTi1JwOlkMaq4Y5JOyj6fgAxI+EmUdL1cO48QgTxBDXab7/qAwu4z93sLnHlLkebmjl9rBOJFp//I8X4pnX5R1byQh30gpoJCq6lOS0+0kxn6UrHuCGN5qobvCy2elfDtRM8l/RRR4XDvv9ASW4oOysVM1w56lUr7tKOTsI+HgquRGdczGJyREbFR1X5Cq5pWr8P4MqRpfoJn7kgjh3C7wc5EY2yVSRbtODHiyGMlZco92i+QowyXXvg/7SU4zu8W44zXv2U6RQslhhf+FXeCzFc6V65bp5fl5qT6f3YWx+opMqyHzV8RJjJPrChIZHFt+L5Y7uEma10iviuGf3gUeehx95P5iV537719PoH/hY5iuGVJXsJZcaO+s41O1IwwRIxikda60uhgmodt4rXlcR06CVnlNK+wup9zI7mCuoFF820nX93Fl6Cdy2r6DObaR039V96IXvWgXQyX/fVouoI+XK4Pz5N8ssyRNqGNLuURupCVD5Q8AT2h7j9uLDrAm/au8F92P/SQtGCqn6mNyTztN6xxtN7kkXi7h84DyziFS3u/FKqDX6HrRWfSTkKy/5PJzdN/Vy/8F/gNf/RRvVGFq6AAAAABJRU5ErkJggg==") top left no-repeat;
+}
+
+.warning { background-color:#F62; color:#000; }
+.info { background-color:#26F; color:#000; }
+.info a { color:#268; }
+</style>
+</head>
+<body>
+
+  <!-- Warning -->
+
+  <div class="warning">Translation in Progress</div>
+  <div class="info">
+    The original version in french-language is still
+    <a href="/ocaml/didacticiel-ocaml.html">available here</a>.
+  </div>
+
+  <!-- Notice -->
+
+  <h4 id="def_notice">Notice d'utilisation</h4>
+
+  <div>&copy; 2005 2006 2007 2018 Florent Monnier</div>
+
+  <div class="notice">
+    This tutorial is provided under
+    <a href="http://www.fsf.org/licensing/licenses/fdl.html">FDL</a> license,
+    which means that you can reuse it, with or without modifications
+    as long as the copyright is preserved, and its license.<br />
+    You can also use the
+    <a href="http://creativecommons.org/licenses/by-sa/2.5/">CC-by-sa</a>
+    license if you prefer.<br />
+    You are also invited to send me messages to suggest me improuvements,
+    or to fix errors.
+    <!--
+    Vous &ecirc;tes &eacute;galement invit&eacute; &agrave; m'&eacute;crire
+    pour me sugg&eacute;rer des am&eacute;liorations, ou simplement pour me
+    soumettre des suggestions.
+    -->
+    <!--
+    <div id="contact">&nbsp;</div>
+    -->
+  </div>
+
+  <div class="notice">
+    
+  </div>
+
+
+  <h1>Introduction about OCaml</h1>
+
+  <div>
+    OCaml (also called Objective Caml) is a programming and scripting language.
+    The goal of this document is to provide an introduction about the basic elements
+    of this programming language.
+  </div>
+
+  <div>
+    (Don't try to contact me on this electronic mail anymore, I forgot the password.)
+    <div id="contact">&nbsp;</div>
+  </div>
+
+  <div>
+    As explained on the website of this programming language, ocaml is
+    supposed to be a programming language created by the
+    <a href="http://www.inria.fr/">INRIA</a>.<br />
+    It is advertised as a programming language with a safety of execution,
+    and with strongly typed elements.<br />
+    It is also described as a functional programming language, but not
+    a pure one as Haskell.
+  </div>
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+  <ul>
+    <li><a href="#def_intractif">The interactive loop</a></li>
+    <li><a href="#def_tprim">Basic Types</a></li>
+    <li><a href="#def_transtypage">Transtyping</a></li>
+    <li><a href="#def_tableaux">Arrays</a></li>
+    <li><a href="#def_list">Lists</a></li>
+    <li><a href="#def_tuple">Tuples</a></li>
+    <li><a href="#def_func">Functions</a></li>
+    <li><a href="#def_if">Conditions with "if"</a></li>
+    <li><a href="#def_for">The for loop</a></li>
+    <li><a href="#def_funcloop">Making loops with functions</a></li>
+    <li><a href="#def_match">Filtering with the match construct</a></li>
+    <li><a href="#def_iter">Iterating Lists and Arrays</a></li>
+    <li><a href="#def_record">Using Records</a></li>
+    <li><a href="#def_record_imup">Imutable updates for Records</a></li>
+    <li><a href="#def_variant">Variants</a></li>
+    <li><a href="#def_warnarr">Warning about arrays</a></li>
+    <li><a href="#def_tailrec">Terminal recursion</a></li>
+    <li><a href="#def_script">Scripts and binaries</a></li>
+    <li><a href="#def_further">Going further</a></li>
+  </ul>
+
+  <hr />
+  <!-- ======================================================== -->
+
+
+  <h4 id="def_difmodexe">Different Execution modes</h4>
+
+  <div>
+    OCaml provides several execution modes:
+  </div>
+
+  <ul id="modes">
+    <li>
+      <span class="mode">Binaries, compiled to natif code</span><br />
+      <span class="detl">(similar than with the C programing language and with similar performences)</span>
+    </li>
+    <li>
+      <span class="mode">With Bytecodes that you run with a virtual machine</span><br />
+      <span class="detl">(like Java and with equivalent performences)</span>
+    </li>
+    <li>
+      <span class="mode">As a script</span><br />
+      <span class="detl">(like Python, Perl, Ruby or PHP, you will have similar fun)</span>
+    </li>
+    <li>
+      <span class="mode">With the Interactive loop, for real-time interaction with the user,
+        also called the "toplevel"</span><br />
+      <span class="detl">(similar than the 'python3' command)</span>
+    </li>
+  </ul>
+
+
+  <div>
+    All these execution modes will be seen with more details later.
+    In this tutorial, we first experiment with the top-level.
+  </div>
+
+
+
+  <h4 id="def_styles">Different Programming Styles</h4>
+
+  <div>
+    We can adopt several programming styles with ocaml: functional, imperative, object,
+    modular, and mix these different programming styles.<br />
+    The functional style is supposed to be better when it's about to avoid side effects.<br />
+    It's usually usefull to avoid a lot of global variables, that are difficult to track down.<br />
+    It also has as advantage to make your functions easier to test.<br />
+    The drawback is that it sometimes make the code more complicated, when we have to
+    update or calculate several elements at the same times.<br />
+  </div>
+
+  <div>
+    <!--
+    Voici pour vous mettre l'eau &agrave; la bouche et vous donner l'envie de
+    -->
+    If you want to continue, then find an online interactive loop to begin,
+    or even install it from:
+    <a href="https://ocaml.org/docs/install.html"
+            >https://ocaml.org/docs/install.html</a><br />
+    or you may install it from the installer provided with your computer or the
+    device you're using.
+  </div>
+
+
+
+  <h3 id="def_intractif">The interactive loop</h3>
+
+  <div>
+    To begin, one of the first step is to get used to the type system of ocaml
+    which is a quite strong type system.  It might feel constraining at the
+    beginning but it could be of some help, while using it.
+  </div>
+
+  <div class="nb">
+    Then you can use the interactive loop, called the "toplevel", with the 'ocaml'
+    command in the console. You should then get a new session with a prompt similar
+    than this one:
+  </div>
+<pre>
+[guest@localhost &tilde;]$ ocaml
+        <span class="Stat">OCaml version 4.12.2</span>
+
+#
+</pre>
+
+  <div>
+    Every expression should be followed by two
+    '<code><span class="Stat">;</span></code>':
+    <br />
+    <code><span class="Stat">;;</span></code>
+  </div>
+
+  <div>
+    In order to understand the type system, we will see the primitive types first,
+    they are the base elements:
+  </div>
+
+
+  <!--
+  <div class="nb">
+    Vous pouvez &eacute;galement am&eacute;liorer les capacit&eacute;s d'&eacute;dition
+    de l'interpr&eacute;teur interactif en utilisant <code>rlwrap</code>&nbsp;:
+  </div>
+  -->
+  <div class="nb">
+    It's also possible to make it easier to make edits in the interactive loop
+    with the <code>rlwrap</code> tool, like this:
+  </div>
+<pre>
+[guest@localhost &tilde;]$ rlwrap ocaml
+      <span class="Stat">OCaml version 4.12.2</span>
+
+#
+</pre>
+  <div class="nb">
+    This tool offers a read-line interface, which adds edits capabilities in the
+    interactive loop.
+  </div>
+
+  <!--
+  <div class="nt">
+    In the name <code>rlwrap</code>, the 2 letters <code>rl</code> mean
+    <code>read-line</code>, it means that it's a command to wrap the interactive
+    loop with <code>read-line</code> capabilities (recording lines, and calling
+    past lines with the <code>up</code> arrow, and moving left and right, with
+    left, and right arrows).
+  </div>
+  -->
+
+
+  <h4 id="def_tprim">Basic Types</h4>
+
+  <div class="nb">
+    1) The integer type (integer number), try to type in the prompt:
+  </div>
+<pre>
+# <span class="Const">4</span> <span class="Stat">;;</span>
+</pre>
+  <div class="nbnt">
+    The interactive loop will then reply with the type of the expression
+    that the type system inferred (guess), followed by its value:
+  </div>
+<pre>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">4</span>
+</pre>
+
+
+
+  <div class="nb">
+    2) floating point numbers (float's):
+  </div>
+<pre>
+# <span class="Const">8.6</span> <span class="Stat">;;</span>
+- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">8.6</span>
+</pre>
+  <div class="nbnt">
+    The dot is required so that the type system knows it's a float, even if there
+    is nothing after:
+  </div>
+<pre>
+# <span class="Const">12.</span> <span class="Stat">;;</span>
+- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">12.</span>
+</pre>
+  <div class="nbnt">
+    Otherwise we would get an integer:
+  </div>
+<pre>
+# <span class="Const">12</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">12</span>
+</pre>
+
+
+
+  <div class="nb">
+    3) The boolean type, which value is either <code>true</code> or <code>false</code>:
+  </div>
+<pre>
+# <span class="Const">true</span> <span class="Stat">;;</span>
+- : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">true</span>
+# <span class="Const">false</span> <span class="Stat">;;</span>
+- : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">false</span>
+</pre>
+
+
+
+  <div class="nb">
+    4) The character type (one, and only one character.)
+    They are provided between single quotes:
+  </div>
+<pre>
+# <span class="Const">'e'</span> <span class="Stat">;;</span>
+- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'e'</span>
+</pre>
+
+  <div class="nb">
+    5) The string type, contains zero, or several characters.
+    They are provided between double quotes:
+  </div>
+<pre>
+# <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+</pre>
+
+  <div class="nb">
+    The concatenation operator for strings is:
+  </div>
+<pre>
+# <span class="Const">&quot;OC&quot;</span> <span class="Stat">^</span> <span class="Const">&quot;aml&quot;</span><span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+</pre>
+
+  <div class="nb">
+    You can access to any character of a string like this:
+  </div>
+<pre>
+# <span class="Const">&quot;OCaml&quot;</span>.<span class="Stat">[</span><span class="Const">2</span><span class="Stat">]</span> <span class="Stat">;;</span>
+- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'a'</span>
+</pre>
+  <div class="nt">
+    As you can see, the type of the element returned is the character type
+    <code>char</code> as you would expect.
+    The index starts at <code>0</code> (zero) for the first character, and
+    the last one is <code>n-1</code>, with <code>n</code> been the number
+    of chars in the string.
+    (if the string contains some utf-8 special characters, n might be different
+    than what you expect, because special characters may take 2 bytes/octets.)
+  </div>
+
+  <div class="nb">
+    If we try to access to a char beyond the last one, an exception will be raised:
+  </div>
+<pre>
+# <span class="Const">&quot;OCaml&quot;</span>.<span class="Stat">[</span><span class="Const">26</span><span class="Stat">]</span> <span class="Stat">;;</span>
+<span class="Const">Exception</span>: <span class="Const">Invalid_argument</span> <span class="Const">&quot;index out of bounds&quot;</span>.
+</pre>
+
+  <div>
+    Defining, raising and catching exceptions will be seen below.
+  </div>
+
+
+  <div class="nb">
+    6) The type &laquo;&nbsp;unit&nbsp;&raquo;&nbsp;:
+  </div>
+<pre>
+# <span class="Const">()</span> <span class="Stat">;;</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+
+  <div>
+    This type is a kind of empty entity.
+    It is used for example when a function doesn't need any parameters.
+    This is also the default returned type when a function does something
+    but doesn't have anything to return.
+    This type is not exactly the same than 
+    &laquo;&nbsp;void&nbsp;&raquo; and &laquo;&nbsp;NULL&nbsp;&raquo;
+    of other languages, because its use is not exactly the same.
+  </div>
+
+
+
+  <div class="nb">
+    A function that doesn't have anything to return, will return a single
+    &laquo;&nbsp;unit&nbsp;&raquo;&nbsp;:
+  </div>
+<pre>
+# print_endline <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
+<span class="Const">OCaml</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+  <div class="nt">
+    Here the function does something (displaying text, which is considered as a "side effect"),
+    but doesn't have anything to return, so the default returned value is a single "unit".
+  </div>
+
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+  <h4 id="def_transtypage">Transtyping</h4>
+
+  <div>
+    OCaml features a strong type system, because it is believed that a statically
+    strong type system, is a great help, in order to avoid programming errors.
+    OCaml will not do any "implicit type coercion", because it is believed that it
+    can lead to incidious errors, so ocaml programmers have to do it explicitly.
+    ("type coercion" is converting a type to another compatible type, like for example
+    converting an integer number into a float number, or the opposite.)<br />
+  </div>
+
+  <div class="nb">
+    To convert an integer number into a floatting point number, you can do:
+  </div>
+<pre>
+# float_of_int <span class="Const">16</span> <span class="Stat">;;</span>
+- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">16.</span>
+</pre>
+  <div class="nbnt">
+    And the opposite conversion:
+  </div>
+<pre>
+# int_of_float <span class="Const">12.0</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">12</span>
+</pre>
+
+
+  <div class="nb">
+    If you want to get the ascii-code (character encoding) of a character, you can do:
+  </div>
+<pre>
+# int_of_char <span class="Const">'A'</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">65</span>
+</pre>
+  <div class="nbnt">
+    And the reverse:
+  </div>
+<pre>
+# char_of_int <span class="Const">97</span> <span class="Stat">;;</span>
+- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'a'</span>
+</pre>
+
+
+  <div class="nb">
+    In a similar way, fr arithmetic operations, the numbers have to be of the same type:
+  </div>
+<pre>
+# <span class="Const">4</span> <span class="Stat">+</span> <span class="Const">6</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">10</span>
+</pre>
+
+
+  <div class="nb">
+    For arithmetic operations with floats, operators have to be suffixed with a dot:
+  </div>
+<pre>
+# <span class="Const">2.4</span> <span class="Stat">*.</span> <span class="Const">1.2</span> <span class="Stat">;;</span>
+- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">2.88</span>
+</pre>
+
+
+  <div class="nb">
+    You can mix both using a coercion from a type to another:
+  </div>
+<pre>
+# <span class="Stat">(</span>float_of_int <span class="Const">9</span><span class="Stat">)</span> <span class="Stat">/.</span> <span class="Const">1.2</span> <span class="Stat">;;</span>
+- : <span class="Type">float</span> <span class="Stat">=</span> <span class="Const">7.5</span>
+</pre>
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <div class="nb">
+    In order to define a "named-value" (some data, or a function),
+    we can use the <code>let</code> construct follow by a name
+    that will identify the defined value:
+  </div>
+<pre>
+# <span class="Stat">let</span> my_item <span class="Stat">=</span> <span class="Const">128</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> my_item : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">128</span>
+</pre>
+
+  <div>
+    Here the element that we define is an integer number, and it will be possible
+    to use it everywhere after its definition (where an integer type is expected),
+    using the name that we used to define it.
+    The ocaml top-level, after this definition, will reply with this name, and
+    its associated value, and its infered type.
+    (This name can not start with an upper-case character, or a number.)
+  </div>
+
+  <div class="nb">
+    You can check that the link to the value has properly being defined to
+    its value by calling its name:
+  </div>
+<pre>
+# my_item <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">128</span>
+</pre>
+
+
+  <div class="nb">
+    Most often, the word "variable" is avoided, because ocaml is a functional
+    programming language, and functional programming languages try to avoid
+    mutability, so the variable should not vary. But ocaml is an "impure"
+    functional programming language, so it is possible to introduce mutable
+    elements. It is possible to use the terms: "mutable named-value", in this
+    case in stead of "variable". It is often easier to use the same word than
+    in other programming languages ("variable") though.
+  </div>
+<pre>
+# <span class="Stat">let</span> my_item <span class="Stat">=</span> my_item <span class="Stat">*</span> <span class="Const">2</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> my_item : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">256</span>
+</pre>
+  <div class="nt">
+    It is also possible to redefine another "named-value" with the same name, this
+    is called: "shadowing", because the previous definition is hidden by the new
+    one.
+  </div>
+
+
+  <div>
+    Les variables modifiables transversalement seront vues ult&eacute;rieurement,
+    <!-- TODO -->
+    mais si vous faites le choix d'adopter un style fonctionel vous &eacute;viterez leur usage&nbsp;;
+    le fait que leur valeur soit accessible transversalement induit des effets
+    de bords, souvent &agrave; l'origine de bugs.
+    Il est pratiquement toujours possible d'utiliser une valeur nomm&eacute;e fonctionnelle
+    plut&ocirc;t qu'une variable imp&eacute;rative.
+    <br />
+    Apr&egrave;s pour l'&eacute;criture de scripts, et dans certains cas un style imp&eacute;ratif
+    local &agrave; une fonction permet parfois d'&eacute;crire du code plus simple &agrave;
+    lire et &agrave; &eacute;crire.
+    Il ne faut pas &ecirc;tre trop extr&eacute;miste non plus, la simplicit&eacute; du code
+    &eacute;tant souvent plus importante.
+  </div>
+
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <div>
+    OCaml fournit plusieurs structures permettant de regrouper des
+    &eacute;l&eacute;ments (comme les types primitifs vu en d&eacute;but du didacticiel)&nbsp;:
+    les tableaux (type 'array'), les listes (type 'list') et les tuples.
+    <!-- TODO -->
+    <!--
+    The OCaml programming language provides several data-structures that
+    provides the feature to group several elements of different type kinds.
+    -->
+  </div>
+
+  <!-- Arrays -->
+
+  <h2 id="def_tableaux">Arrays</h2>
+
+  <div class="nb">
+    Arrays can group together, zero, one, or several elements of the same type.
+    The number of elements in ocaml arrays can not change.
+  </div>
+<pre>
+# <span class="Stat">[|</span> <span class="Const">'b'</span><span class="Stat">;</span> <span class="Const">'E'</span><span class="Stat">;</span> <span class="Const">'t'</span><span class="Stat">;</span> <span class="Const">'i'</span> <span class="Stat">|]</span> <span class="Stat">;;</span>
+- : <span class="Type">char</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">'b'</span><span class="Stat">;</span> <span class="Const">'E'</span><span class="Stat">;</span> <span class="Const">'t'</span><span class="Stat">;</span> <span class="Const">'i'</span><span class="Stat">|]</span>
+
+# <span class="Stat">let</span> my_array <span class="Stat">=</span> <span class="Stat">[|</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">;</span> <span class="Const">64</span> <span class="Stat">|]</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> my_array : <span class="Type">int</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">;</span> <span class="Const">64</span><span class="Stat">|]</span>
+</pre>
+
+
+  <div class="nb">
+    Arrays are the right data structure to access any of their element, in constant time, from an index:
+  </div>
+<pre>
+# my_array.<span class="Stat">(</span><span class="Const">2</span><span class="Stat">)</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">7</span>
+</pre>
+  <div class="nt">
+    L'acc&egrave;s &agrave; n'importe quel &eacute;l&eacute;ment d'un tableau se fait en vitesse constante
+    The time that will take the access of one element, is quite small, and is always the same for every
+    elements of the array. This is what we call "constant-time", and in computer complexity-study it is
+    written <strong>O(1)</strong> (pronouced "Oh, one"), and this is not the same for lists, where to
+    access one of its element, we have to pop all the previous elements. This is why with lists, we say
+    that the time needed to access an element, is <strong>O(n)</strong>, where <code>n</code> is the
+    position of the element in the list.
+  </div>
+
+
+  <!-- Lists -->
+
+  <h2 id="def_list">Lists</h2>
+
+  <div class="nb">
+    OCaml lists should also contain only elements of the same kind/type:
+  </div>
+<pre>
+# <span class="Stat">[</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">45</span><span class="Stat">;</span> <span class="Const">24</span><span class="Stat">;</span> <span class="Const">17</span><span class="Stat">;</span> <span class="Const">0</span><span class="Stat">;</span> <span class="Const">9</span> <span class="Stat">]</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">45</span><span class="Stat">;</span> <span class="Const">24</span><span class="Stat">;</span> <span class="Const">17</span><span class="Stat">;</span> <span class="Const">0</span><span class="Stat">;</span> <span class="Const">9</span><span class="Stat">]</span>
+</pre>
+
+
+  <div class="nb">
+    On r&eacute;alise l'empilement et le d&eacute;pilement des
+    &eacute;l&eacute;ments uniquement au sommet de la pile.
+    Les listes ne sont donc pas de taille fixe comme les tableaux.
+  </div>
+<pre>
+# <span class="Stat">let</span> my_list <span class="Stat">=</span> <span class="Stat">[</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span> <span class="Stat">]</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> my_list : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">]</span>
+
+# <span class="Const">8</span> <span class="Stat">::</span> my_list <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">8</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">]</span>
+</pre>
+  <div class="nt">
+    Elle sont bien adapt&eacute;es pour r&eacute;aliser des piles
+    d'&eacute;l&eacute;ments, dans lesquelles on va venir empiler et
+    d&eacute;piler des &eacute;l&eacute;ments au sommet de la pile.
+    (Pensez pour cela &agrave; une pile d'assiette, au sommet de laquelle on
+    vient ajouter les assiettes lav&eacute;es, puis au sommet de laquelle on
+    va venir prendre des assiettes propres lorsqu'on en a besoin.)
+  </div>
+
+
+  <div class="nb">
+    L'empilement et le d&eacute;pilement d'&eacute;l&eacute;ments peuvent
+    &ecirc;tre r&eacute;alis&eacute;s respectivement &agrave; partir et
+    jusqu'&agrave; la liste vide&nbsp;:
+  </div>
+<pre>
+# <span class="Const">[]</span> <span class="Stat">;;</span>
+- : 'a <span class="Type">list</span> <span class="Stat">=</span> <span class="Const">[]</span>
+</pre>
+  <div class="nt">
+    (Le &laquo;&nbsp;'a&nbsp;&raquo; indique alors que le type est ind&eacute;fini.)
+  </div>
+
+  <div>
+    Les listes sont bien adapt&eacute;es lorsque ses &eacute;l&eacute;ments
+    doivent &ecirc;tre parcourus de mani&egrave;re s&eacute;quentielle.
+  </div>
+
+
+  <!-- Tuples -->
+
+  <h2 id="def_tuple">Tuples</h2>
+
+  <div class="nb">
+    Les tuples permettent de regrouper des &eacute;l&eacute;ments qui peuvent
+    &ecirc;tre de type diff&eacute;rent. Ils regroupent g&eacute;n&eacute;ralement
+    un petit nombre d'&eacute;l&eacute;ments.
+    Il sont utilis&eacute;s par exemple lorsqu'une fonction doit retourner
+    plusieurs &eacute;l&eacute;ments (qui seront alors regroup&eacute;s dans un
+    tuple).
+  </div>
+  <div class="nb">
+    Tuples can group elements that can be of several different types. They usually
+    group a small number of elements together.
+    They are used for example when a function can return several elements.
+  </div>
+<pre>
+# <span class="Stat">(</span><span class="Const">3</span>, <span class="Const">'F'</span><span class="Stat">)</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">*</span> <span class="Type">char</span> <span class="Stat">=</span> <span class="Stat">(</span><span class="Const">3</span>, <span class="Const">'F'</span><span class="Stat">)</span>
+
+# <span class="Stat">let</span> a <span class="Stat">=</span> <span class="Const">3</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> a : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">3</span>
+# <span class="Stat">let</span> b <span class="Stat">=</span> <span class="Const">'F'</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> b : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'F'</span>
+
+# <span class="Stat">let</span> <span class="Stat">(</span>a, b<span class="Stat">)</span> <span class="Stat">=</span> <span class="Stat">(</span>b, a<span class="Stat">)</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> a : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'F'</span>
+<span class="Stat">val</span> b : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">3</span>
+
+# a <span class="Stat">;;</span>
+- : <span class="Type">char</span> <span class="Stat">=</span> <span class="Const">'F'</span>
+# b <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">3</span>
+</pre>
+
+  <div class="nb">
+    Tuples can contain anything, numbers, chars, strings, lists, arrays,
+    and even functions!
+  </div>
+<pre>
+# <span class="Stat">(</span><span class="Const">12.5</span>, <span class="Const">&quot;www.ifrc.org&quot;</span>, float_of_int<span class="Stat">)</span> <span class="Stat">;;</span>
+- : <span class="Type">float</span> <span class="Stat">*</span> <span class="Type">string</span> <span class="Stat">*</span> <span class="Stat">(</span><span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">float</span><span class="Stat">)</span> <span class="Stat">=</span> <span class="Stat">(</span><span class="Const">12.5</span>, <span class="Const">&quot;www.ifrc.org&quot;</span>, <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span><span class="Stat">)</span>
+</pre>
+  <div class="nt">
+    Et comme nous l'avons dit, en OCaml tout a un type, m&ecirc;me les fonctions
+    ont leur type. Nous allons voir &ccedil;a plus bas.
+  </div>
+
+  <div>
+    Le fait que les fonctions puissent être plac&eacute;e dans des structures
+    et pass&eacute;es en param&egrave;tre de fonction, on dit que les fonctions sont
+    des &eacute;l&eacute;ments de premi&egrave;re classe
+    (<a href="https://www.ecosia.org/search?q=first+class+citizen+functions"
+      >"first class citizen functions"</a> en anglais).
+  </div>
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <h2 id="def_func">Functions</h2>
+
+  <div class="nb">
+    L'environnement OCaml fournit par d&eacute;faut un ensemble de fonctions
+    contenues dans sa librairie standard, compos&eacute;e de plusieurs "modules".
+    Le nom des modules commence toujours par une majuscule, par exemple
+    le module <strong>String</strong> qui fournit des fonctions pour manipuler les
+    cha&icirc;nes de caract&egrave;res. Une des fonctions fournies par le module
+    <strong>String</strong>
+    est la fonction '<em>length</em>'. Pour pouvoir l'utiliser il faut soit faire
+    pr&eacute;c&eacute;der le nom de la fonction par le nom du module, soit ouvrir le
+    module 'String' au pr&eacute;alable. Voici les deux m&eacute;thodes&nbsp;:
+  </div>
+<pre>
+# <span class="Mod">String</span>.length <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5</span>
+
+# <span class="Stat">open</span> <span class="Mod">String</span> <span class="Stat">;;</span>
+# length <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5</span>
+</pre>
+  <div class="nt">
+    Once opened, the functions of a module are accessible in the current
+    repl session, or source code file, or code block.
+  </div>
+
+
+  <div class="nb">
+    OCaml est un langage &agrave; expression. Chaque &eacute;l&eacute;ment
+    est une expression, et chaque expression a un type.
+    Ceci s'exp&eacute;rimente ainsi en tapant juste le nom d'une fonction,
+    le type de la fonction est alors indiqu&eacute;&nbsp;:
+  </div>
+<pre>
+# length <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+</pre>
+  <div>
+    Le type d'une fonction est en quelque sorte ce que l'on appelle le
+    prototype d'une fonction dans d'autres langages, mais ce n'est pas
+    totalement &eacute;quivalent en raison des possibilit&eacute;s d'application
+    partielle d'OCaml qui seront vues ult&eacute;rieurement.<br />
+    Ici on voit que la fonction '<code>length</code>' prend un argument
+    de type 'string' (chaine de caract&egrave;re) et qu'elle renvoie
+    un &eacute;l&eacute;ment de type 'int' (entier).
+    <!-- TODO -->
+  </div>
+
+
+  <div class="nb">
+    <!-- TODO -->
+    OCaml &eacute;tant fortement typ&eacute;, il est ainsi utile de v&eacute;rifier
+    le type d'une fonction avant de l'utiliser, afin de bien avoir en t&ecirc;te
+    le type des param&egrave;tres &agrave; lui passer, et le type du ou des
+    &eacute;l&eacute;ments ou de l'expression de retour de la fonction.
+    On peut ainsi v&eacute;rifier le type des fonctions utilis&eacute;es au
+    tout d&eacute;but de cette introduction &agrave; OCaml&nbsp;:
+  </div>
+<pre>
+# float_of_int <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">float</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+# int_of_char <span class="Stat">;;</span>
+- : <span class="Type">char</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+# print_string <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+</pre>
+
+
+  <div>
+    Ces fonctions font partie du module
+    <a href="https://ocaml.org/releases/4.11/htmlman/libref/Stdlib.html"
+    >'Stdlib'</a>
+    qui est le module ouvert par d&eacute;faut (il n'y a pas besoin de l'ouvrir pour
+    en utiliser ses fonctions).
+    <br />
+    Si vous souhaitez utiliser une ancienne version d'OCaml le module 'Stdlib'
+    se nommait 'Pervasives' avant.
+    <br />
+    Nous avons &eacute;galement &eacute;voqu&eacute; le
+    <a href="https://ocaml.org/releases/4.11/htmlman/libref/String.html"
+    >module String</a> juste avant,
+    <a href="https://ocaml.org/releases/4.11/htmlman/libref/index_modules.html"
+    >chaque module a une page de documentation</a> dans le
+    <a href="https://ocaml.org/releases/latest/manual.html">manuel d'OCaml</a>.<br />
+    Cependant pour utiliser certaines de ces fonctions, vous aurez
+    probablement besoin d'en conna&icirc;tre un petit peu plus sur OCaml avant,
+    donc lisez la suite.
+  </div>
+
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <div class="nb">
+    Pour d&eacute;finir une fonction nomm&eacute;e on utilise le constructeur 'let',
+    comme pour d&eacute;finir une valeur&nbsp;:
+  </div>
+<pre>
+# <span class="Stat">let</span> step a <span class="Stat">=</span> a + <span class="Const">2</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> step : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+# step <span class="Const">6</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">8</span>
+</pre>
+  <div class="nt">
+    OCaml &eacute;tant un langage &agrave; expression il n'est point besoin
+    d'utiliser une instruction 'return' comme dans d'autres langages, on donne
+    directement l'expression qui doit &ecirc;tre renvoy&eacute;e.
+  </div>
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <div>
+    Dans un programme ou un script, nous avons souvent besoin de pouvoir
+    ex&eacute;cuter certaines parties de codes plut&ocirc;t que d'autres.
+    OCaml offre plusieurs structures de contr&ocirc;le pour cela.
+  </div>
+
+  <div>
+    (Si vous connaissez d&eacute;j&agrave; des langages de programmation ou de
+    script, vous serez peut-&ecirc;tre un peu d&eacute;pays&eacute; par celles
+    d'OCaml.)
+  </div>
+
+  <!-- If -->
+
+  <h2 id="def_if">Condition IF</h2>
+
+  <div class="nb">
+    La fa&ccedil;on la plus simple d'utiliser la structure 'if' ("si" en fran&ccedil;ais),
+    est de lui fournir une comparaison de ce genre&nbsp;:
+  </div>
+<pre>
+# <span class="Const">2</span> <span class="Stat">&gt;</span> <span class="Const">3</span> <span class="Stat">;;</span>
+- : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">false</span>
+</pre>
+  <div class="nt">
+    ici 2 n'est pas sup&eacute;rieur &agrave; 3 donc le bool&eacute;en 'false'
+    est retourn&eacute;.
+  </div>
+
+  <div>
+    (Pour l'&eacute;galit&eacute; utilisez de pr&eacute;f&eacute;rence
+    &laquo;&nbsp;=&nbsp;&raquo; &agrave; &laquo;&nbsp;==&nbsp;&raquo; sauf si vous
+    &ecirc;tes s&ucirc;r que vous recherchez strictement l'&eacute;galit&eacute;
+    physique de la zone de RAM point&eacute;e.)
+  </div>
+
+  <div class="nb">
+    La structure de contr&ocirc;le 'if' doit obligatoirement utiliser le type
+    bool&eacute;en (bool)&nbsp;:
+  </div>
+<pre>
+# <span class="Stat">if</span> <span class="Const">2</span> <span class="Stat">&gt;</span> <span class="Const">3</span> <span class="Stat">then</span> <span class="Const">&quot;first case&quot;</span> <span class="Stat">else</span> <span class="Const">&quot;second case&quot;</span> <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;second case&quot;</span>
+</pre>
+  <div class="nbnt">
+    On peut d&eacute;velopper l'expression pr&eacute;c&eacute;dente&nbsp;:
+  </div>
+<pre>
+# <span class="Stat">let</span> condition <span class="Stat">=</span> <span class="Stat">(</span><span class="Const">2</span> <span class="Stat">&gt;</span> <span class="Const">3</span><span class="Stat">)</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> condition : <span class="Type">bool</span> <span class="Stat">=</span> <span class="Const">false</span>
+
+# <span class="Stat">if</span> condition
+  <span class="Stat">then</span> <span class="Const">&quot;la condition est vraie&quot;</span>
+  <span class="Stat">else</span> <span class="Const">&quot;la condition est fausse&quot;</span>
+  <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;la condition est fausse&quot;</span>
+</pre>
+
+
+  <div class="nb">
+    Comme les fonctions qui n'utilisent pas d'instruction return,
+    cette structure de contr&ocirc;le renvoie directement une expression,
+    qui peut &ecirc;tre utilis&eacute;e par exemple pour d&eacute;finir
+    une valeur nomm&eacute;e&nbsp;:
+  </div>
+<pre>
+# <span class="Stat">let</span> lang <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> lang : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+
+# <span class="Stat">let</span> my_item <span class="Stat">=</span>
+    <span class="Stat">if</span> lang.<span class="Stat">[</span><span class="Const">0</span><span class="Stat">]</span> <span class="Stat">=</span> <span class="Const">'O'</span>
+    <span class="Stat">then</span> <span class="Const">&quot;Objective&quot;</span>
+    <span class="Stat">else</span> <span class="Const">&quot;Unknown&quot;</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> my_item : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;Objective&quot;</span>
+</pre>
+
+
+
+  <div class="nb">
+    Enchainement de structures if ("for&ecirc;ts d'else if")&nbsp;:
+  </div>
+<pre>
+# <span class="Stat">let</span> comp a <span class="Stat">=</span>
+    <span class="Stat">if</span> a <span class="Stat">=</span> <span class="Const">4</span>
+    <span class="Stat">then</span> <span class="Const">&quot;equal&quot;</span>
+    <span class="Stat">else</span> <span class="Stat">if</span> a <span class="Stat">&gt;</span> <span class="Const">4</span>
+      <span class="Stat">then</span> <span class="Const">&quot;sup&quot;</span>
+      <span class="Stat">else</span> <span class="Const">&quot;inf&quot;</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> comp : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">string</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+# comp <span class="Const">6</span> <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;sup&quot;</span>
+</pre>
+
+  <div>
+    Afin de garantir le type retourn&eacute; par la structure if, ses deux branches
+    <code><span class="Stat">then</span></code> et <code><span class="Stat">else</span></code>
+    doivent imp&eacute;rativement retourner des &eacute;l&eacute;ments de m&ecirc;me type
+    (ce qui est donc le type de l'ensemble de l'expression).
+  </div>
+
+
+  <div class="nb">
+    Le seul cas o&ugrave; il n'y a pas besoin de sp&eacute;cifier la seconde branche 
+    <code><span class="Stat">else</span></code>
+    c'est lorsque la premi&egrave;re branche est de type &laquo;&nbsp;unit&nbsp;&raquo;.
+  </div>
+<pre>
+# <span class="Stat">let</span> is_equal_to_5 this <span class="Stat">=</span>
+    <span class="Stat">if</span> this <span class="Stat">=</span> <span class="Const">5</span>
+    <span class="Stat">then</span> print_endline <span class="Const">&quot;this is equal to 5&quot;</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> is_equal_to_5 : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+# is_equal_to_5  <span class="Const">3</span> <span class="Stat">;;</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+
+# is_equal_to_5  <span class="Const">5</span> <span class="Stat">;;</span>
+<span class="Const">this is equal to 5</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+
+  <!-- ======================================================== -->
+  <!-- Loops -->
+  <hr />
+
+  <h2>Loops</h2>
+
+  <h3 id="def_for">For loops</h3>
+
+<pre>
+# <span class="Stat">for</span> var <span class="Stat">=</span> <span class="Const">2</span> <span class="Stat">to</span> <span class="Const">6</span> <span class="Stat">do</span>
+    print_endline <span class="Stat">(</span><span class="Const">&quot;var value is &quot;</span> <span class="Stat">^</span> <span class="Stat">(</span>string_of_int var<span class="Stat">))</span>
+  <span class="Stat">done</span>
+  <span class="Stat">;;</span>
+<span class="Const">var value is 2</span>
+<span class="Const">var value is 3</span>
+<span class="Const">var value is 4</span>
+<span class="Const">var value is 5</span>
+<span class="Const">var value is 6</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+  <div>
+    Ici nous voyons appara&icirc;tre comme type de retours pour l'ensemble de
+    l'expression le type &laquo;&nbsp;unit&nbsp;&raquo;. En effet la structure
+    de contr&ocirc;le for correspond au type de programmation imp&eacute;rative,
+    et elle ne peut contenir que des &eacute;l&eacute;ments dont la valeur de
+    retours est le type &laquo;&nbsp;unit&nbsp;&raquo;.
+  </div>
+
+
+  <div class="nb">
+    Pour placer plusieurs instructions &agrave; l'int&eacute;rieur d'une
+    boucle for, utilisez le s&eacute;parateur point virgule ';' entre
+    chaque instruction comme ceci&nbsp;:
+  </div>
+<pre>
+# <span class="Stat">for</span> var <span class="Stat">=</span> <span class="Const">2</span> <span class="Stat">to</span> <span class="Const">6</span> <span class="Stat">do</span>
+    print_string <span class="Const">&quot;var value is &quot;</span> <span class="Stat">;</span>
+    print_int var <span class="Stat">;</span>
+    print_newline <span class="Const">()</span>
+  <span class="Stat">done</span>
+  <span class="Stat">;;</span>
+<span class="Const">var value is 2</span>
+<span class="Const">var value is 3</span>
+<span class="Const">var value is 4</span>
+<span class="Const">var value is 5</span>
+<span class="Const">var value is 6</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+  <div>
+    Pour &eacute;viter le style imp&eacute;ratif de cette structure de contr&ocirc;le,
+    OCaml fournit une alternative offrant beaucoup plus de possibilit&eacute;s,
+    et surtout une suret&eacute; tr&egrave;s largement accrue.
+    <!--
+    (Ceci pourra &ecirc;tre vu ult&eacute;rieurement dans un prochain didacticiel
+    traitant du style de programmation fonctionnel.)
+    -->
+  </div>
+
+
+  <h3 id="def_funcloop">Loops with functions</h3>
+
+  <div class="nb">
+    It's possible to create loops with functions calling themself.<br />
+    We need to add the keyword <code>'<span class="Stat">rec</span>'</code>
+    (which stands for recursive) when we define these functions.
+  </div>
+<pre>
+# <span class="Stat">let</span> <span class="Stat">rec</span> loop a <span class="Stat">=</span>
+    print_int a<span class="Stat">;</span>
+    print_newline <span class="Const">()</span><span class="Stat">;</span>
+    <span class="Stat">if</span> a <span class="Stat">&gt;</span> <span class="Const">0</span> <span class="Stat">then</span>
+      loop <span class="Stat">(</span>a - <span class="Const">1</span><span class="Stat">)</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> loop : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+# loop <span class="Const">5</span> <span class="Stat">;;</span>
+<span class="Const">5</span>
+<span class="Const">4</span>
+<span class="Const">3</span>
+<span class="Const">2</span>
+<span class="Const">1</span>
+<span class="Const">0</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+  <div class="nt">
+    Le grand danger cependant avec des boucles r&eacute;alis&eacute;es de cette
+    mani&egrave;re est d'en &eacute;crire une qui ne s'arr&ecirc;tent jamais.<br />
+    Il faut donc pr&ecirc;ter un soin tout particulier
+    &agrave; la condition d'arr&ecirc;t.<br />
+    Dans l'exemple ci-dessus, la fonction s'appelle elle-m&ecirc;me avec
+    un argument sans cesse inf&eacute;rieur, il nous est donc possible de
+    r&eacute;aliser le rebouclage que lorsque l'argument est sup&eacute;rieur
+    &agrave; une certaine valeur, puisqu'il descendra forc&eacute;ment &agrave;
+    un moment en dessous de celle-ci.
+  </div>
+
+<!-- TODO: another tutorial about the tail recursive functions -->
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+  <!-- Match -->
+
+  <h2 id="def_match">Match</h2>
+  <div>
+    <!-- TODO -->
+    Dans son utilisation basique la plus rudimentaire, cette structure de
+    contr&ocirc;le pourrait &ecirc;tre vue comme un &eacute;quivalent de
+    la structure de contr&ocirc;le &laquo;&nbsp;switch&nbsp;&raquo; que
+    l'on connait dans d'autres langages de programmation et de script.<br />
+    (&Agrave; ceci pr&ecirc;t que &laquo;&nbsp;match&nbsp;&raquo; permet
+    d'aller bien au del&agrave;.)
+  </div>
+
+  <div class="nb">
+    Here is a simple example:
+  </div>
+<pre>
+# <span class="Stat">let</span> var <span class="Stat">=</span> <span class="Const">2</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> var : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">2</span>
+
+# <span class="Stat">match</span> var <span class="Stat">with</span>
+  <span class="Stat">|</span> <span class="Const">1</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;un&quot;</span>
+  <span class="Stat">|</span> <span class="Const">2</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;deux&quot;</span>
+  <span class="Stat">|</span> <span class="Const">3</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;trois&quot;</span>
+  <span class="Stat">|</span> <span class="Stat">_</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;je ne sais pas compter au del&agrave; de trois&quot;</span>
+  <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;deux&quot;</span>
+</pre>
+
+  <div>
+    Ici la valeur de var est 2, l'&eacute;l&eacute;ment correspondant
+    apr&egrave;s la fl&egrave;che est donc retourn&eacute;.
+  </div>
+
+
+  <div>
+    L'englobement du &laquo;&nbsp;match&nbsp;&raquo; doit toujours &ecirc;tre
+    exhaustif, d'une part, et toutes les expressions suivant chaque englobement
+    doivent &ecirc;tre de m&ecirc;me type. Ce type sera ainsi le type de
+    l'ensemble de l'expression &laquo;&nbsp;match&nbsp;&raquo;.
+    (encore cette fameuse histoire de typage fort destin&eacute; &agrave;
+    assurer le bon fonctionnement de votre code).<br />
+    Le dernier englobement &laquo;&nbsp;_&nbsp;&raquo; est utilis&eacute; si
+    aucune des entr&eacute;es le pr&eacute;c&eacute;dant ne correspond.<br />
+    <small>
+      (L'englobement &laquo;&nbsp;_&nbsp;&raquo;  est &agrave; peu pr&egrave;s
+      &eacute;quivalent de la directive &laquo;&nbsp;default&nbsp;&raquo; des
+      structures 'switch' d'autres langages.)
+    </small>
+    <br />
+    L'englobement peut parfois &ecirc;tre exhaustif sans celui-ci
+    (voir l'exemple &agrave; la fin).
+  </div>
+
+
+  <div class="nb">
+    Pr&eacute;c&eacute;demment nous avions vu comment empiler un
+    &eacute;l&eacute;ment &agrave; une liste.
+    Voici comment en d&eacute;piler un&nbsp;:
+  </div>
+<pre>
+# <span class="Stat">let</span> li <span class="Stat">=</span> <span class="Stat">[</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">32</span> <span class="Stat">]</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> li : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">2</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">32</span><span class="Stat">]</span>
+
+# <span class="Stat">match</span> li <span class="Stat">with</span>
+  <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span> tail
+  <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span> <span class="Const">[]</span>
+  <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">8</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">32</span><span class="Stat">]</span>
+<span class="Comm">(* Dans le jargon, on d&eacute;signe le premier &eacute;l&eacute;ment d'une liste comme</span>
+<span class="Comm">   sa t&ecirc;te (head en anglais), et le reste comme sa suite (tail).</span>
+<span class="Comm">   Ici l'expression renvoie la suite de la liste nomm&eacute;e &laquo;&nbsp;li&nbsp;&raquo;. *)</span>
+
+# <span class="Stat">match</span> li <span class="Stat">with</span>
+  <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span>
+      print_string <span class="Const">&quot;the head is &quot;</span><span class="Stat">;</span>
+      print_int head<span class="Stat">;</span>
+      print_newline <span class="Const">()</span><span class="Stat">;</span>
+  <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span>
+      print_endline <span class="Const">&quot;the list is empty&quot;</span><span class="Stat">;</span>
+  <span class="Stat">;;</span>
+<span class="Const">the head is 2</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+<!--
+<pre>
+# <span class="Stat">match</span> li <span class="Stat">with</span>
+  <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span> <span class="Const">Some</span> head
+  <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span> <span class="Const">None</span>
+  <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">option</span> <span class="Stat">=</span> <span class="Const">Some</span> <span class="Const">2</span>
+</pre>
+-->
+
+
+
+  <div>
+    <small>(ici on voit aussi appara&icirc;tre du commentaire entre les
+    s&eacute;quences
+      '<code><span class="Comm">(*</span></code>' et
+      '<code><span class="Comm">*)</span></code>')</small>
+  </div>
+
+  <div>
+    En utilisant cette possibilit&eacute; de d&eacute;sempilement au sein
+    d'une boucle faite avec une fonction r&eacute;cursive, cela permet alors
+    de parcourir tous les &eacute;l&eacute;ments d'une liste.
+  </div>
+
+<pre>
+# <span class="Stat">let</span> li <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">2</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">]</span> <span class="Stat">in</span>
+  <span class="Stat">let</span> <span class="Stat">rec</span> loop li <span class="Stat">=</span>
+    <span class="Stat">match</span> li <span class="Stat">with</span>
+    <span class="Stat">|</span> head <span class="Stat">::</span> tail <span class="Stat">-&gt;</span>
+        print_int head<span class="Stat">;</span>
+        print_newline <span class="Const">()</span><span class="Stat">;</span>
+        loop tail<span class="Stat">;</span>
+    <span class="Stat">|</span> <span class="Const">[]</span> <span class="Stat">-&gt;</span>
+        print_endline <span class="Const">&quot;End Of List&quot;</span><span class="Stat">;</span>
+  <span class="Stat">in</span>
+  loop li
+  <span class="Stat">;;</span>
+<span class="Const">2</span>
+<span class="Const">3</span>
+<span class="Const">5</span>
+<span class="Const">7</span>
+<span class="Const">End</span> <span class="Const">Of</span> <span class="Const">List</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+
+  <!-- ======================================================== -->
+
+  <hr />
+
+
+  <h2 id="def_iter">"Foreach"</h2>
+  <h4>(Iteration sur les listes et les tableaux)</h4>
+
+  <div>
+    Si vous connaissez d'autres langages et que vous recherchez un
+    &eacute;quivalent de la structure foreach, la m&ecirc;me chose peut-&ecirc;tre
+    r&eacute;alis&eacute;e pour parcourir tous les &eacute;l&eacute;ments d'une
+    liste avec les fonctions &laquo;&nbsp;iter&nbsp;&raquo; (imp&eacute;ratif)
+    et &laquo;&nbsp;map&nbsp;&raquo; (fonctionnel) du module
+    <a href="http://caml.inria.fr/pub/docs/manual-ocaml/libref/List.html"
+    >'List'</a>
+    de la librairie standard d'OCaml.
+  </div>
+
+<pre>
+# <span class="Stat">let</span> for_each item <span class="Stat">=</span> item <span class="Stat">*</span> <span class="Const">2</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> for_each : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+# <span class="Stat">let</span> my_list <span class="Stat">=</span> <span class="Stat">[</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">22</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">16</span> <span class="Stat">]</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> my_list : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">5</span><span class="Stat">;</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">22</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">16</span><span class="Stat">]</span>
+
+# <span class="Mod">List</span>.map  for_each  my_list <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">10</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">44</span><span class="Stat">;</span> <span class="Const">6</span><span class="Stat">;</span> <span class="Const">32</span><span class="Stat">]</span>
+</pre>
+  <div class="nt">
+    Ici la fonction <strong>for_each</strong> est appliqu&eacute;e successivement
+    &agrave; chaque &eacute;l&eacute;ment de la liste <strong>my_list</strong>.
+    <br />
+    Ainsi la fonction prend en argument un des &eacute;l&eacute;ments de la
+    liste (qui doit donc avoir le m&ecirc;me type que l'arguement de la fonction),
+    et les r&eacute;sultats successifs de la fonction sont empil&eacute;s dans
+    une nouvelle liste qui est le r&eacute;sultat global de l'appel &agrave;
+    <code><span class="Mod">List</span>.map for_each my_list</code>.
+    Cette op&eacute;ration fonctionne donc comme un filtre.
+  </div>
+
+
+  <div>
+    Si la fonction for_each n'est utilis&eacute;e qu'&agrave; un seul endroit
+    du code, elle peut &ecirc;tre d&eacute;finie localement au sein de
+    l'expression en cours, plut&ocirc;t que globalement.
+    (On pourrait tenter la comparaison avec les fonctions inline de C++)
+    Il faut alors la terminer par 'in' &agrave; la place de ';;' comme ceci&nbsp;:
+  </div>
+
+
+<pre>
+# <span class="Stat">let</span> each item <span class="Stat">=</span>
+    item <span class="Stat">+</span> <span class="Const">4</span>
+  <span class="Stat">in</span>
+  <span class="Mod">List</span>.map each <span class="Stat">[</span><span class="Const">10</span><span class="Stat">;</span> <span class="Const">50</span><span class="Stat">;</span> <span class="Const">30</span><span class="Stat">;</span> <span class="Const">80</span><span class="Stat">;</span> <span class="Const">20</span><span class="Stat">]</span>
+  <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">14</span><span class="Stat">;</span> <span class="Const">54</span><span class="Stat">;</span> <span class="Const">34</span><span class="Stat">;</span> <span class="Const">84</span><span class="Stat">;</span> <span class="Const">24</span><span class="Stat">]</span>
+</pre>
+
+  <div>
+    Elle ne sera alors disponible et accessible que dans l'expression
+    en cours, comme vous pouvez le v&eacute;rifier&nbsp;:
+  </div>
+<pre>
+# each <span class="Stat">;;</span>
+<span class="Const">Unbound value each</span>
+</pre>
+
+<!-- WIP -->
+
+  <div class="nb">
+    Une fonction anonyme peut aussi &ecirc;tre utilis&eacute;e&nbsp;:
+  </div>
+<pre>
+# <span class="Mod">List</span>.iter
+    <span class="Stat">(fun</span> i <span class="Stat">-&gt;</span> print_int i <span class="Stat">;</span> print_newline <span class="Const">()</span><span class="Stat">)</span>
+    <span class="Stat">[</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">64</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">16</span> <span class="Stat">]</span>
+  <span class="Stat">;;</span>
+<span class="Const">8</span>
+<span class="Const">64</span>
+<span class="Const">2</span>
+<span class="Const">16</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+  <div>&nbsp;</div>
+
+<pre>
+# <span class="Stat">let</span> high_level_languages <span class="Stat">=</span> <span class="Stat">[</span>
+    <span class="Const">&quot;LISP&quot;</span><span class="Stat">;</span>
+    <span class="Const">&quot;Perl&quot;</span><span class="Stat">;</span>
+    <span class="Const">&quot;Python&quot;</span><span class="Stat">;</span>
+    <span class="Const">&quot;PHP&quot;</span><span class="Stat">;</span>
+    <span class="Const">&quot;Ruby&quot;</span><span class="Stat">;</span>
+    <span class="Const">&quot;OCaml&quot;</span><span class="Stat">;</span>
+    <span class="Const">&quot;Nim&quot;</span>
+  <span class="Stat">]</span> <span class="Stat">in</span>
+  <span class="Mod">List</span>.iter <span class="Stat">(fun</span> lang <span class="Stat">-&gt;</span> print_endline lang<span class="Stat">)</span> high_level_languages
+  <span class="Stat">;;</span>
+<span class="Const">LISP</span>
+<span class="Const">Perl</span>
+<span class="Const">Python</span>
+<span class="Const">PHP</span>
+<span class="Const">Ruby</span>
+<span class="Const">OCaml</span>
+<span class="Const">Nim</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+</pre>
+
+  <div>
+    Pour parcourir les &eacute;l&eacute;ments d'un tableau au lieu d'une liste,
+    il existe deux fonctions semblables &laquo;&nbsp;iter&nbsp;&raquo; et
+    &laquo;&nbsp;map&nbsp;&raquo; dans le module
+    <a href=
+    "http://caml.inria.fr/pub/docs/manual-ocaml/libref/Array.html#VALiter"
+    >'Array'</a>.
+  </div>
+
+
+  <!-- ======================================================== -->
+
+  <!-- Records -->
+
+  <hr />
+
+  <h2 id="def_record">Using Records</h2>
+
+  <div>
+    OCaml records are data structures that should be defined before to be used.<br />
+    This data structure is similar than tuples, except than every field can be
+    accessed with a name (the field-name).<br />
+    <!-- TODO -->
+    The OCaml programming language provides the record data-structure to group
+    several elements of different type kinds.<br />
+    They need to be defined, (with the key-word <code>type</code>), before they
+    can be used.<br />
+    The definition, defines every field, with a field name, and its type kind.
+    .<br />
+  </div>
+
+<!--
+# type someone = { name: string; phone: string } ;;
+type someone = { name : string; phone : string; }
+
+# let doe = {
+    name = "Doe";
+    phone = "FD.CE.AF";
+} ;;        
+val doe : someone = {name = "Doe"; phone = "FD.CE.AF"}
+
+# doe.phone ;;
+- : string = "FD.CE.AF"
+
+# let doe = { doe with phone = "FD.CE.AF" } ;;
+val doe : someone = {name = "Doe"; phone = "FD.CE.AF"}
+-->
+<pre>
+<span class="PreProc">#</span> <span class="Stat">type</span> person <span class="Stat">=</span> <span class="Stat">{</span> name: <span class="Type">string</span><span class="Stat">;</span> telephone: <span class="Type">string</span><span class="Stat">;</span> <span class="Stat">}</span> <span class="Stat">;;</span>
+<span class="Stat">type</span> person <span class="Stat">=</span> <span class="Stat">{</span> name : <span class="Type">string</span><span class="Stat">;</span> telephone : <span class="Type">string</span><span class="Stat">;</span> <span class="Stat">}</span>
+
+<span class="PreProc">#</span> <span class="Stat">let</span> doe <span class="Stat">=</span> <span class="Stat">{</span>
+    name <span class="Stat">=</span> <span class="Const">&quot;Doe&quot;</span><span class="Stat">;</span>
+    telephone <span class="Stat">=</span> <span class="Const">"FD.CE.AF"</span><span class="Stat">;</span>
+<span class="Stat">}</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> doe : person <span class="Stat">=</span> <span class="Stat">{</span>name <span class="Stat">=</span> <span class="Const">&quot;Doe&quot;</span><span class="Stat">;</span> telephone <span class="Stat">=</span> <span class="Const">"FD.CE.AF"</span><span class="Stat">;</span> <span class="Stat">}</span>
+
+<span class="PreProc">#</span> doe.telephone <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">"FD.CE.AF"</span>
+</pre>
+
+
+  <hr />
+
+  <h2 id="def_record_imup">Les Enregistrements&nbsp;: Mise &agrave; Jour Immuable</h2>
+
+  <div>
+    (ou "Immutable Update" en anglais)<br />
+    En programmation fonctionnelle les variables ne sont pas sens&eacute;es changer de valeur,
+    pour obtenir un nouvel enregistrement avec un des champs mis &agrave; jour,
+    en OCaml nous proc&eacute;dons comme suit&nbsp;:
+  </div>
+<!--
+# let doe = { doe with telephone = "C85.5C8" } ;;
+val doe : person = {nom = "Doe"; telephone = "C85.5C8"}
+-->
+<pre>
+<span class="PreProc">#</span> <span class="Stat">let</span> doe <span class="Stat">=</span> <span class="Stat">{</span> doe <span class="Stat">with</span> telephone <span class="Stat">=</span> <span class="Const">"C85.5C8"</span> <span class="Stat">}</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> doe : person <span class="Stat">=</span> <span class="Stat">{</span>nom <span class="Stat">=</span> <span class="Const">&quot;Doe&quot;</span><span class="Stat">;</span> telephone <span class="Stat">=</span> <span class="Const">"C85.5C8"</span><span class="Stat">}</span>
+</pre>
+
+
+<!--
+    Champs polymorphes
+
+type 'a info = {nom : string; valeur : 'a} ;;
+fun x -> x.valeur;;
+- : 'a info -> 'a
+
+    Attention! un nom peut en cacher un autre!
+    L'&eacute;tiquette nom d&eacute;signe la projection de l'enregistrement 'a info,
+    le champ nom du type monnaie dernier est devenu inaccessible.
+-->
+
+<!--
+  <h2>Les structures mutables</h2>
+
+  <div>
+    Les champs d&eacute;clar&eacute;s mutable au moment de la d&eacute;finition pourront &ecirc;tre modifi&eacute;s.
+    Par exemple
+  </div>
+
+<pre>
+type personne = {nom : string; mutable age : int};;
+(* permettra de modifier le champ age, mais pas le champ nom. *)
+let p = { nom = "Paul"; age = 23 } ;;
+val p : personne = {nom = "Paul"; age = 23}
+
+let anniversaire x = x.age <- x.age + 1 ;;
+val anniversaire : personne -> unit = <fun>
+
+p.nom <- "Clovis";;
+Characters 0-17:
+The label nom is not mutable
+
+</pre>
+-->
+
+  <!-- ======================================================== -->
+  <hr />
+
+  <h2 id="def_variant">Les Variants</h2>
+
+  <div>
+    Les variants sont &eacute;galement des types qui doivent &ecirc;tre
+    d&eacute;clar&eacute;s avec une d&eacute;finition.<br />
+    Voici un exemple librement inspir&eacute; d'un exemple de David MENTRE&nbsp;:
+  </div>
+
+<pre>
+# <span class="Stat">type</span> chocolat <span class="Stat">=</span> <span class="Const">Chocolat_noir</span> <span class="Stat">|</span> <span class="Const">Chocolat_blanc</span> <span class="Stat">|</span> <span class="Const">Chocolat_au_lait</span> <span class="Stat">;;</span>
+<span class="Stat">type</span> chocolat <span class="Stat">=</span> <span class="Const">Chocolat_noir</span> <span class="Stat">|</span> <span class="Const">Chocolat_blanc</span> <span class="Stat">|</span> <span class="Const">Chocolat_au_lait</span>
+
+# <span class="Stat">let</span> quoi_en_faire tablette <span class="Stat">=</span>
+    <span class="Stat">match</span> tablette <span class="Stat">with</span>
+    <span class="Stat">|</span> <span class="Const">Chocolat_noir</span>    <span class="Stat">-&gt;</span> <span class="Const">&quot;Je le mange goul&ucirc;ment&nbsp;!&quot;</span>
+    <span class="Stat">|</span> <span class="Const">Chocolat_au_lait</span> <span class="Stat">-&gt;</span> <span class="Const">&quot;Je le refile &agrave; ma petite soeur.&quot;</span>
+    <span class="Stat">|</span> <span class="Const">Chocolat_blanc</span>   <span class="Stat">-&gt;</span> <span class="Const">&quot;Je le refile &agrave; mon voisin...&quot;</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> quoi_en_faire : chocolat <span class="Stat">-&gt;</span> <span class="Type">string</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+# quoi_en_faire <span class="Const">Chocolat_noir</span> <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;Je le mange goul&ucirc;ment&nbsp;!&quot;</span>
+</pre>
+
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <h2 id="def_warnarr">Mise en garde contre les tableaux</h2>
+
+  <div>
+    Attention les tableaux contrairement aux listes sont des structures
+    de type imp&eacute;rative dont les &eacute;l&eacute;ments sont
+    modifi&eacute;s en place, et donc avec ce que l'on appel des effets de bord.
+    Si une fonction en modifie un &eacute;l&eacute;ment, cette modification
+    prendra effet transversalement, comme le montre cet exemple&nbsp;:
+  </div>
+
+<!--
+# let arr = [| 1; 2; 3; 4; 5 |] ;;
+val arr : int array = [|1; 2; 3; 4; 5|]
+
+# let modif i v =
+    arr.(i) <- v;
+  ;;
+val modif : int -> int -> unit = <fun>
+
+# modif 2 1024 ;;
+- : unit = ()
+
+# arr ;;
+- : int array = [|1; 2; 1024; 4; 5|]
+-->
+
+<pre>
+<span class="PreProc">#</span> <span class="Stat">let</span> arr <span class="Stat">=</span> <span class="Stat">[|</span> <span class="Const">1</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span> <span class="Stat">|]</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> arr : <span class="Type">int</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">3</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">|]</span>
+
+<span class="PreProc">#</span> <span class="Stat">let</span> modif i v <span class="Stat">=</span>
+    arr.<span class="Stat">(</span>i<span class="Stat">)</span> <span class="Stat">&lt;-</span> v<span class="Stat">;</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> modif : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+<span class="PreProc">#</span> modif <span class="Const">2</span> <span class="Const">1024</span> <span class="Stat">;;</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+
+<span class="PreProc">#</span> arr <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">array</span> <span class="Stat">=</span> <span class="Stat">[|</span><span class="Const">1</span><span class="Stat">;</span> <span class="Const">2</span><span class="Stat">;</span> <span class="Const">1024</span><span class="Stat">;</span> <span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">|]</span>
+</pre>
+
+
+  <div>
+    Ainsi si une fonction modifie un tableau avant de s'en servir pour
+    quelqu'usage que ce soit, celui-ci ne sera pas intact apr&egrave;s l'appel
+    &agrave; cette fonction. Il faut y penser et y &ecirc;tre attentif pour en
+    tenir compte.
+  </div>
+
+  <div>
+    Ce type de probl&egrave;me n'existe pas avec les listes qui sont des structures
+    de type fonctionnel.
+  </div>
+
+  <div>
+    Le m&ecirc;me type d'effet de bord peuvent avoir lieu avec les cha&icirc;nes de
+    caract&egrave;res&nbsp;:
+  </div>
+
+<!--
+# let str = "OCaml" ;;
+val str : string = "OCaml"
+
+# let modif str i c =
+    str.[i] <- c;
+  ;;
+val modif : string -> int -> char -> unit = <fun>
+
+# modif str 1 'k' ;;
+- : unit = ()
+
+# str ;;
+- : string = "Okaml"
+-->
+
+<pre>
+<span class="PreProc">#</span> <span class="Stat">let</span> str <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span> <span class="Stat">;;</span>
+<span class="Stat">val</span> str : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;OCaml&quot;</span>
+
+<span class="PreProc">#</span> <span class="Stat">let</span> modif str i c <span class="Stat">=</span>
+    str.<span class="Stat">[</span>i<span class="Stat">]</span> <span class="Stat">&lt;-</span> c<span class="Stat">;</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> modif : <span class="Type">string</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">char</span> <span class="Stat">-&gt;</span> <span class="Type">unit</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+<span class="PreProc">#</span> modif str <span class="Const">1</span> <span class="Const">'k'</span> <span class="Stat">;;</span>
+- : <span class="Type">unit</span> <span class="Stat">=</span> <span class="Const">()</span>
+
+<span class="PreProc">#</span> str <span class="Stat">;;</span>
+- : <span class="Type">string</span> <span class="Stat">=</span> <span class="Const">&quot;Okaml&quot;</span>
+</pre>
+
+  <div>
+    Ainsi si une fonction a besoin d'utiliser une version modifi&eacute;e
+    d'un tableau ou d'une cha&icirc;ne de caract&egrave;re et que le programme
+    en cours aura encore besoin de leur version originale apr&egrave;s l'appel
+    de fonction en question, vous pouvez utiliser une copie locale &agrave;
+    la place de l'originale avec les fonctions
+    <code><span class="Mod">String</span>.copy</code> ou
+    <code><span class="Mod">Array</span>.copy</code>.
+  </div>
+
+
+
+  <hr />
+  <!-- ======================================================== -->
+
+  <h3 id="def_tailrec">Terminal Recursion</h3>
+
+
+  <div>
+    La r&eacute;cursivit&eacute; terminale est une notion tr&egrave;s importante
+    &agrave; ma&icirc;triser en OCaml,
+    car de sa ma&icirc;trise d&eacute;pend la
+    <a href="http://fr.wiktionary.org/wiki/scalabilit&eacute;"
+    >scalabilit&eacute;</a>
+    de vos programmes.
+  </div>
+
+  <div>
+    Voici un exemple de fonction r&eacute;cursive qui calcule la somme d'une
+    suite d'entier de 1 jusqu'&agrave; un nombre donn&eacute;&nbsp;:
+  </div>
+
+<pre>
+<span class="PreProc">#</span> <span class="Stat">let</span> <span class="Stat">rec</span> add x <span class="Stat">=</span>
+    <span class="Stat">if</span> x <span class="Stat">&lt;</span><span class="Stat">=</span> <span class="Const">0</span>
+    <span class="Stat">then</span> <span class="Const">0</span>
+    <span class="Stat">else</span> x + add <span class="Stat">(</span>x - <span class="Const">1</span><span class="Stat">)</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> add : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+</pre>
+
+  <div>
+    &Agrave; priori, cette fonction para&icirc;t correcte, sauf que pour des valeurs &eacute;lev&eacute;es
+    il risque d'y avoir une surcharge qui emp&egrave;chera &agrave; cette fonction
+    de renvoyer le r&eacute;sultat.
+  </div>
+
+<pre>
+<span class="PreProc">#</span>  add <span class="Const">10</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">55</span>
+
+<span class="PreProc">#</span> add <span class="Const">100</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">5050</span>
+
+<span class="PreProc">#</span> add <span class="Const">10_000</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">50005000</span>
+
+<span class="PreProc">#</span> add <span class="Const">100_000</span> <span class="Stat">;;</span>
+<span class="Alert">Stack overflow during evaluation (looping recursion?).</span>
+</pre>
+
+  <div>
+    Voici ce qui se passe, &agrave; la derni&egrave;re ligne de la fonction,
+    &agrave; la suite du else, il y a une addition avec le r&eacute;sultat
+    d'un appel de fonction, donc le calcul ne peut &ecirc;tre r&eacute;alis&eacute;
+    aussit&ocirc;t car il faut d'abord calculer le r&eacute;sultat de cette
+    fonction, le calcul est donc laiss&eacute; en suspend en attendant.
+    Or il y aurra autant de calcul laiss&eacute;s en suspend que d'appel total
+    &agrave; la fonction, ce nombre correspondant ici &agrave; la valeur du
+    param&egrave;tre.<br />
+    Donc pour cent mille, il y aurra cent mille appels successifs &agrave; la
+    fonction et donc cent mille calculs laiss&eacute;s en instance&nbsp;!<br />
+    La pile d'appel des fonctions (stack) est alors surcharg&eacute;e (overflow).
+    <br />
+    C'est un peu comme une personne qui aurait du travail &agrave; faire et qui
+    chaque jour le remettrait au lendemain, et &agrave; la fin il se retrouverait
+    incapable de r&eacute;aliser tout le travail accumul&eacute;.
+  </div>
+
+  <div>
+    La solution est donc de r&eacute;aliser le calcul &agrave; faire &agrave;
+    chaque &eacute;tape et de passer le r&eacute;sultat &agrave; la boucle
+    suivante.<br />
+    Il faut donc r&eacute;aliser une fonction auxiliaire <code>'aux'</code>
+    avec un param&egrave;tre additionnel <code>'acc'</code>
+    o&ugrave; le r&eacute;sultat final s'accumule &agrave; chaque boucle&nbsp;:
+  </div>
+
+<pre>
+<span class="PreProc">#</span> <span class="Stat">let</span> addt x <span class="Stat">=</span>
+    <span class="Stat">let</span> <span class="Stat">rec</span> aux x acc <span class="Stat">=</span>
+      <span class="Stat">if</span> x <span class="Stat">&lt;=</span> <span class="Const">0</span>
+      <span class="Stat">then</span> acc
+      <span class="Stat">else</span> aux <span class="Stat">(</span>x - <span class="Const">1</span><span class="Stat">)</span> <span class="Stat">(</span>x + acc<span class="Stat">)</span>
+    <span class="Stat">in</span>
+    aux x <span class="Const">0</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> addt : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+<span class="PreProc">#</span> addt <span class="Const">100_000</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Stat">=</span> <span class="Const">705082704</span>
+</pre>
+
+  <div>
+    La nouvelle fonction est alors dite "r&eacute;cursive terminale", car
+    dans la r&eacute;cursivit&eacute; le r&eacute;sultat est donn&eacute; en
+    position terminale,
+    ici au niveau du <code>'then'</code>,
+    alors qu'avant c'&eacute;tait le bout de la cha&icirc;ne le r&eacute;sultat
+    &eacute;tant situ&eacute;
+    au niveau de l'addition (lors de la derni&egrave;re boucle).<br />
+    Dans la premi&egrave;re version de la fonction, le then renvoyait un 0,
+    c'est donc avec cette valeur que la variable acc est initialis&eacute;e
+    lors de l'appel &agrave; la fonction auxiliaire aux.
+  </div>
+
+
+  <hr />
+  <!-- ======================================================== -->
+
+
+  <div>
+    Voici un autre exemple de fonction r&eacute;cursive non terminale.
+    Cette fonction produit une liste d'entiers entre deux entiers donn&eacute;s&nbsp;:
+  </div>
+
+
+<pre>
+<span class="PreProc">#</span> <span class="Stat">let</span> <span class="Stat">rec</span> up_to m n <span class="Stat">=</span>
+    <span class="Stat">if</span> m <span class="Stat">&gt;</span> n
+      <span class="Stat">then</span> up_to n m
+      <span class="Stat">else</span> <span class="Stat">if</span> m <span class="Stat">=</span> n
+        <span class="Stat">then</span> <span class="Stat">[</span>m<span class="Stat">]</span>
+        <span class="Stat">else</span> m <span class="Stat">::</span> up_to <span class="Stat">(</span>m+<span class="Const">1</span><span class="Stat">)</span> n
+    <span class="Stat">;;</span>
+<span class="Stat">val</span> up_to : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+<span class="PreProc">#</span> up_to <span class="Const">4</span> <span class="Const">12</span><span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">6</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">9</span><span class="Stat">;</span> <span class="Const">10</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">]</span>
+</pre>
+
+
+  <div>
+    Et voici la version r&eacute;cursive terminale&nbsp;:
+  </div>
+
+
+<pre>
+<span class="PreProc">#</span> <span class="Stat">let</span> up_to m n <span class="Stat">=</span>
+  <span class="Stat">let</span> <span class="Stat">rec</span> aux m n acc <span class="Stat">=</span>
+    <span class="Stat">if</span> m <span class="Stat">&gt;</span> n
+    <span class="Stat">then</span> acc
+    <span class="Stat">else</span> aux m <span class="Stat">(</span>n-<span class="Const">1</span><span class="Stat">)</span> <span class="Stat">(</span>n<span class="Stat">::</span>acc<span class="Stat">)</span>
+  <span class="Stat">in</span>
+  <span class="Stat">if</span> m <span class="Stat">&gt;</span> n
+  <span class="Stat">then</span> aux n m <span class="Const">[]</span>
+  <span class="Stat">else</span> aux m n <span class="Const">[]</span>
+  <span class="Stat">;;</span>
+<span class="Stat">val</span> up_to : <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Stat">-&gt;</span> <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">&lt;</span><span class="Stat">fun</span><span class="Stat">&gt;</span>
+
+<span class="PreProc">#</span> up_to <span class="Const">4</span> <span class="Const">12</span> <span class="Stat">;;</span>
+- : <span class="Type">int</span> <span class="Type">list</span> <span class="Stat">=</span> <span class="Stat">[</span><span class="Const">4</span><span class="Stat">;</span> <span class="Const">5</span><span class="Stat">;</span> <span class="Const">6</span><span class="Stat">;</span> <span class="Const">7</span><span class="Stat">;</span> <span class="Const">8</span><span class="Stat">;</span> <span class="Const">9</span><span class="Stat">;</span> <span class="Const">10</span><span class="Stat">;</span> <span class="Const">11</span><span class="Stat">;</span> <span class="Const">12</span><span class="Stat">]</span>
+</pre>
+
+
+  <div>
+    On peut v&eacute;rifier la capacit&eacute; de ces deux fonctions avec<br />
+    <code>ignore<span class="Stat">(</span>up_to <span class="Const">0 100000</span><span class="Stat">) ;;</span></code><br />
+    la version r&eacute;cursive terminale est effectivement plus performante.
+  </div>
+
+  <div>
+    D'apr&egrave;s le manuel d'OCaml, il faut utiliser une version r&eacute;cursive terminale
+    d&egrave;s lors que le nombre d'&eacute;l&eacute;ments des listes &agrave; traiter peut d&eacute;passer les dix milles
+    (environ).
+  </div>
+
+
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+  <h2 id="def_script">Script et ex&eacute;cutables</h2>
+
+
+  <div class="nb">
+    Apr&egrave;s avoir utilis&eacute; le top-level, maintenant voyons comment cr&eacute;er des scripts
+    et des ex&eacute;cutables. Pour cel&agrave; ouvrez un nouveau fichier avec l'extension de fichier
+    <em>.ml</em> correspondant aux fichiers source OCaml, et &eacute;crivez une simple instruction,
+    comme par exemple&nbsp;:
+  </div>
+
+<pre>
+print_endline <span class="Const">&quot;Hello World!&quot;</span> <span class="Stat">;;</span>
+</pre>
+
+  <div class="nb">
+    Pour ex&eacute;cuter ce fichier en tant que script, il suffit ensuite de lancer l'interpr&eacute;teur
+    en ligne de commande avec le script en argument comme ceci&nbsp;:
+  </div>
+
+<pre>
+$ ocaml hello.ml
+</pre>
+
+  <div class="nb">
+    Si vous utilisez un syst&egrave;me de type Unix comme Linux, MacOS ou Cygwin, il vous est &eacute;galement
+    possible de pouvoir ex&eacute;cuter votre script comme un ex&eacute;cutable sans pr&eacute;ciser l'interpr&eacute;teur
+    sur la ligne de commande. Voici comment proc&eacute;der, premi&egrave;rement ajoutez &agrave; la premi&egrave;re
+    ligne du script le chemin de l'interpr&eacute;teur comme ceci&nbsp;:
+  </div>
+
+<pre>
+#!/usr/bin/env ocaml
+</pre>
+  <div class="nbnt">
+    ensuite rendez le ex&eacute;cutable en lui ajoutant les droits d'ex&eacute;cution&nbsp;:
+  </div>
+<pre>
+chmod a+x hello.ml
+</pre>
+  <div class="nbnt">
+    vous pouvez alors ex&eacute;cuter directement votre script comme n'importe quel ex&eacute;cutable&nbsp;:
+  </div>
+<pre>
+./hello.ml
+</pre>
+
+  <div>
+    Et pour ce qui est de cr&eacute;er des ex&eacute;cutables pour de meilleures performences,
+    vous pouvez compiler votre fichier source au choix en code natif ou en byte-code.
+    La compilation en byte-code a pour avantage que l'ex&eacute;cutable pourra &ecirc;tre
+    ex&eacute;cut&eacute; ind&eacute;pendament sur n'importe quel syst&egrave;me d'exploitation o&ugrave; la machine virtuelle
+    OCaml est install&eacute;e. La machine virtuelle est un interpr&eacute;teur qui interpr&egrave;te
+    le code binaire dans lequel a &eacute;t&eacute; compil&eacute; le fichier source.
+    <br />
+    La compilation en code natif a elle pour avantage des performences optimums
+    (comparable &agrave; du C ou du C++).
+  </div>
+
+  <div class="nb">
+    Ainsi pour compiler en byte-code, utilisez le compilateur correspondant&nbsp;:
+  </div>
+
+<pre>
+ocamlc  hello.ml  -o hello.bin
+./hello.bin
+</pre>
+
+  <div class="nb">
+    Et de m&ecirc;me pour compiler un ex&eacute;cutable en code natif&nbsp;:
+  </div>
+
+<pre>
+ocamlopt  hello.ml  -o hello
+./hello
+</pre>
+
+  <div class="nb">
+    Idem pour les utilisateurs de Windows n&eacute;cessitant une extention de fichier&nbsp;:
+  </div>
+
+<pre>
+ocamlopt hello.ml -o hello.exe
+./hello.exe
+</pre>
+
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <div>
+    Voil&agrave; pour un premier &eacute;pisode, il est un peu long et peu amusant
+    pour un d&eacute;but, mais il faux comprendre le typage des expressions
+    avant de pouvoir aller plus loin vers des choses plus &eacute;volu&eacute;es.
+  </div>
+
+  <div>
+    Dites-moi si vous l'avez appr&eacute;ci&eacute; ou pas, pour que je sache si je
+    dois en faire d'autres ou pas.
+  </div>
+
+
+  <h2 id="def_further">Aller plus loin</h2>
+
+  <div>
+    Si vous aimez apprendre en faisant de petits jeux,
+    vous pouvez vous rendre &agrave; cette adresse pour trouver de
+    <a href="https://github.com/fccm/ocaml-sdl2-minigames">petits exemples de mimi-jeux en OCaml</a>.
+  </div>
+
+  <div>
+    Vous pouvez lire cette excellente
+    <a href="https://www.good-eris.net/formation-ocaml/intro.html"
+       >"Introduction au langage OCaml"</a> par Maxence Guesdon
+     sous licence CC-by-nc-sa.
+  </div>
+
+  <div>
+    <a href="https://homepages.loria.fr/EHainry/cours/m4208/introcaml.html"
+      >cours d'introduction &agrave; ocaml</a> par Emmanuel Hainry.
+  </div>
+
+  <div>
+    Divers exemples (avec &eacute;quivalences dans d'autres langages) sur le site
+    <a href="http://rosettacode.org/wiki/Category:OCaml"
+      >RosettaCode.org</a>.
+  </div>
+
+  <div>
+    <a href="https://fr.wikibooks.org/wiki/Objective_Caml"
+      >Wikibook sur ocaml</a> par divers auteurs&nbsp;:
+    <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Bases&offset=&limit=500&action=history"
+      >1</a> /
+    <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Structures&offset=&limit=500&action=history"
+      >2</a> /
+    <a href="https://fr.wikibooks.org/w/index.php?title=Objective_Caml/Modules&offset=&limit=500&action=history"
+      >3</a>.
+  </div>
+
+  <!-- ======================================================== -->
+  <hr />
+
+
+  <div>
+    Camellement v&ocirc;tre&nbsp;!<br />
+    <a href="http://www.fsf.org/licensing/licenses/fdl.html">GNU/FDL</a>
+    &copy; 2005 2006 2007 2018 2025 Florent Monnier
+    <div id="contact">&nbsp;</div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <hr />
+
+  <div style="margin-top: 1.2em; border:0;">
+    <a href=".">sommaire</a>
+  </div>
+
+
+  <div style="margin-top: 1.2em; border:0;">
+    <a href="https://ocaml.org/index.fr.html" title="site internet d'OCaml"
+      ><img src="./ocaml-logo.png"
+         alt="The Caml Language" style="border: none;" /></a>
+  </div>
+
+</body>
+</html>
+<!-- vim: sw=2 sts=2 ts=2 et fdm=marker
+ -->
